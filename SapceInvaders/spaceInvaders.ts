@@ -6,48 +6,19 @@ namespace SpaceInvaders {
     export let flakMesh: ƒ.Mesh = new ƒ.MeshQuad("Flak")
     export let barricadeMesh: ƒ.Mesh = new ƒ.MeshQuad("Barricade");
     export let material: ƒ.Material = new ƒ.Material("Florian", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 1, 1, 1)));
+    export let space: ƒ.Node = new ƒ.Node("Space");
+    export let kanone: ƒ.Node = new ƒ.Node("Kanonenrohr");
+    export let projectileNode: ƒ.Node = new ƒ.Node("Projektilnode");
+    space.addChild(projectileNode);
+    let flak: ƒ.Node = new Flak();
+    space.addChild(flak);
+    //export let motherShip: ƒ.Node = new ƒ.Node("MotherShip");
     //let node: ƒ.Node = new ƒ.Node("Test");
-
     function init(_event: Event): void {
         const canvas: HTMLCanvasElement = document.querySelector("canvas");
 
-        let space: ƒ.Node = new ƒ.Node("Space");
-
-        let flak: ƒ.Node = new ƒ.Node("flak");
-
-        flak.addComponent(new ƒ.ComponentTransform());
-        flak.addComponent(new ƒ.ComponentMesh(flakMesh));
-        flak.getComponent(ƒ.ComponentMesh).mtxPivot.scaleY(7 / 4);
-        flak.getComponent(ƒ.ComponentMesh).mtxPivot.scaleX(2);
-        flak.addComponent(new ƒ.ComponentMaterial(material));
-
-        space.addChild(flak);
-
-        let kanone: ƒ.Node = new ƒ.Node("Kanonenrohr");
-        flak.appendChild(kanone);
-
-        kanone.addComponent(new ƒ.ComponentMesh(flakMesh));
-        kanone.addComponent(new ƒ.ComponentTransform());
-        kanone.getComponent(ƒ.ComponentMesh).mtxPivot.scale(new ƒ.Vector3(0.5, 1.5, 0.5));
-        kanone.getComponent(ƒ.ComponentMesh).mtxPivot.translateY(0.5);
-
-        //let pipeMaterial: ƒ.Material = new ƒ.Material("flakMaterial", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(0, 0, 1, 1)));
-        // let cmpPipeMaterial: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(pipeMaterial);
-
-        kanone.addComponent(new ƒ.ComponentMaterial(material));
-
-        let motherShip: ƒ.Node = new ƒ.Node("MotherShip");
-
-        motherShip.addComponent(new ƒ.ComponentTransform());
-        motherShip.mtxLocal.translateY(140 / 13);
-
-        motherShip.addComponent(new ƒ.ComponentMesh(invaderMesh));
-        motherShip.getComponent(ƒ.ComponentMesh).mtxPivot.scaleX(10 / 4);
-        motherShip.getComponent(ƒ.ComponentMesh).mtxPivot.scaleY(1);
-
-        motherShip.addComponent(new ƒ.ComponentMaterial(material));
-
-        space.addChild(motherShip);
+        let motherships: ƒ.Node = new MotherShip();
+        space.addChild(motherships);
 
         let invaders: ƒ.Node = new ƒ.Node("Invaders");
         for (let i: number = 0; i < 7; i++) {
@@ -59,56 +30,43 @@ namespace SpaceInvaders {
 
         space.addChild(invaders);
 
-        let barricades: ƒ.Node = new ƒ.Node("Barricades");
-        let nStripes: number = 21;
-
-
-        for (let iBarricade: number = 0; iBarricade < 4; iBarricade++) {
-            let barricade: ƒ.Node = new ƒ.Node("Barricade" + iBarricade);
-
-            barricade.addComponent(new ƒ.ComponentTransform());
-            barricade.getComponent(ƒ.ComponentTransform).mtxLocal.translateX((iBarricade - 1.5) * 53 / 13);
-            barricade.getComponent(ƒ.ComponentTransform).mtxLocal.translateY(nStripes / 13);
-
-            for (let iStripe: number = 0; iStripe < nStripes; iStripe++) {
-                let barricadeStripe: ƒ.Node = new ƒ.Node("BarricadeStripe" + (iStripe + iBarricade * nStripes));
-
-                let posX: number = iStripe - (nStripes - 1) / 2;
-                let scaleX: number = 1 / 12;
-
-                barricadeStripe.addComponent(new ƒ.ComponentTransform());
-                barricadeStripe.getComponent(ƒ.ComponentTransform).mtxLocal.translateX(posX * scaleX);
-                barricadeStripe.getComponent(ƒ.ComponentTransform).mtxLocal.translateY(2.5);
-
-                barricadeStripe.addComponent(new ƒ.ComponentMesh(barricadeMesh));
-                barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.scaleX(scaleX);
-                barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.translateX(posX - (1 / 1000000000));
-
-                barricadeStripe.addComponent(new ƒ.ComponentMaterial(material));
-
-                barricade.addChild(barricadeStripe);
-
-            }
-
-            barricades.addChild(barricade);
-        }
+        let barricades: ƒ.Node = new Barricade();
         space.addChild(barricades);
 
-        let projectiles: ƒ.Node = new ƒ.Node("Projektile");
-        for (let i: number = 0; i < 3; i++) {
-            let projectile: ƒ.Node = new Projektile(1, i);
-            projectiles.addChild(projectile);
-        }
-        kanone.addChild(projectiles);
+
+        ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);
+        ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
 
         let cmpCamera: ƒ.ComponentCamera = new ƒ.ComponentCamera();
         cmpCamera.mtxPivot.translateZ(18);
         cmpCamera.mtxPivot.translateY(77 / 13);
         cmpCamera.mtxPivot.rotateY(180);
-        console.log(cmpCamera);
 
         viewport.initialize("Viewport", space, cmpCamera, canvas);
         viewport.draw();
+    }
 
+    function update(_event: Event): void {
+        let tempo: number = ƒ.Loop.timeFrameReal / 60;
+
+
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]) && flak.mtxLocal.translation.x > -7)
+            flak.mtxLocal.translateX(-tempo);
+
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]) && flak.mtxLocal.translation.x < 7)
+            flak.mtxLocal.translateX(tempo);
+
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])) {
+            // let projectiles: ƒ.Node = new ƒ.Node("Projektile");
+            //for (let i: number = 0; i < 3; i++) {
+            let projectile: ƒ.Node = new Projectile(flak.mtxLocal.translation.x + 1, flak.mtxLocal.translation.y);
+            //  projectiles.addChild(projectile);
+            projectileNode.addChild(projectile);
+        }
+       // projectileNode.addComponent(new ƒ.ComponentTransform);
+       // projectileNode.mtxLocal.translateY(tempo);
+
+        viewport.draw();
+        //   console.log(flak.mtxLocal.translation.x);
     }
 }
