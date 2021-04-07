@@ -39,7 +39,7 @@ var SpaceInvaders;
         viewport.draw();
     }
     function update(_event) {
-        let tempo = ƒ.Loop.timeFrameReal / 60;
+        let tempo = (ƒ.Loop.timeFrameReal / 1000) * 6;
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]) && flak.mtxLocal.translation.x > -7)
             flak.mtxLocal.translateX(-tempo);
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]) && flak.mtxLocal.translation.x < 7)
@@ -51,10 +51,13 @@ var SpaceInvaders;
             //  projectiles.addChild(projectile);
             SpaceInvaders.projectileNode.addChild(projectile);
         }
-        // projectileNode.addComponent(new ƒ.ComponentTransform);
-        // projectileNode.mtxLocal.translateY(tempo);
+        //projectileNode.mtxLocal.translateY(-2);
+        SpaceInvaders.projectileNode.getChildrenByName("Projektile").forEach((projectile) => {
+            projectile.mtxLocal.translateY(tempo);
+        });
         viewport.draw();
         //   console.log(flak.mtxLocal.translation.x);
     }
+    // console.log(projectileNode);
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=SpaceInvaders.js.map

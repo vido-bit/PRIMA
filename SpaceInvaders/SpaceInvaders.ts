@@ -12,6 +12,7 @@ namespace SpaceInvaders {
     space.addChild(projectileNode);
     let flak: ƒ.Node = new Flak();
     space.addChild(flak);
+    
     //export let motherShip: ƒ.Node = new ƒ.Node("MotherShip");
     //let node: ƒ.Node = new ƒ.Node("Test");
     function init(_event: Event): void {
@@ -47,7 +48,8 @@ namespace SpaceInvaders {
     }
 
     function update(_event: Event): void {
-        let tempo: number = ƒ.Loop.timeFrameReal / 60;
+
+        let tempo: number = (ƒ.Loop.timeFrameReal / 1000) * 6;
 
 
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]) && flak.mtxLocal.translation.x > -7)
@@ -62,11 +64,20 @@ namespace SpaceInvaders {
             let projectile: ƒ.Node = new Projectile(flak.mtxLocal.translation.x + 1, flak.mtxLocal.translation.y);
             //  projectiles.addChild(projectile);
             projectileNode.addChild(projectile);
+            
         }
-       // projectileNode.addComponent(new ƒ.ComponentTransform);
-       // projectileNode.mtxLocal.translateY(tempo);
+        
+        //projectileNode.mtxLocal.translateY(-2);
+        projectileNode.getChildrenByName("Projektile").forEach((projectile) => {
+            projectile.mtxLocal.translateY(tempo); 
+
+        }
+        );
+
+  
 
         viewport.draw();
         //   console.log(flak.mtxLocal.translation.x);
     }
+    // console.log(projectileNode);
 }

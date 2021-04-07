@@ -3,7 +3,7 @@ var SpaceInvaders;
     var ƒ = FudgeCore;
     class Projectile extends ƒ.Node {
         constructor(_x, _y) {
-            super("Projektile" + (_x + _y));
+            super("Projektile");
             this.addComponent(new ƒ.ComponentTransform());
             this.mtxLocal.translateX(_x - 1);
             this.mtxLocal.translateY(_y * (3 / 2) + 2.5);

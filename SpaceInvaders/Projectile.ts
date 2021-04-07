@@ -5,7 +5,7 @@ namespace SpaceInvaders {
 
     export class Projectile extends ƒ.Node {
         constructor(_x: number, _y: number) {
-            super("Projektile" + (_x + _y));
+            super("Projektile");
 
             this.addComponent(new ƒ.ComponentTransform());
             this.mtxLocal.translateX(_x - 1);
