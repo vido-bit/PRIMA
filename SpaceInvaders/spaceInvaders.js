@@ -56,8 +56,6 @@ var SpaceInvaders;
             projectile.mtxLocal.translateY(tempo);
         });
         viewport.draw();
-        //   console.log(flak.mtxLocal.translation.x);
     }
-    // console.log(projectileNode);
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=SpaceInvaders.js.map

@@ -70,14 +70,9 @@ namespace SpaceInvaders {
         //projectileNode.mtxLocal.translateY(-2);
         projectileNode.getChildrenByName("Projektile").forEach((projectile) => {
             projectile.mtxLocal.translateY(tempo); 
-
         }
         );
 
-  
-
         viewport.draw();
-        //   console.log(flak.mtxLocal.translation.x);
     }
-    // console.log(projectileNode);
 }
