@@ -15,7 +15,6 @@ namespace SpaceInvaders {
 
             this.addComponent(new ƒ.ComponentMaterial(material));
 
-            
         }
     }
 }
