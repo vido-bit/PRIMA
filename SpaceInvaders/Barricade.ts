@@ -2,9 +2,11 @@
 namespace SpaceInvaders {
     import ƒ = FudgeCore;
 
-    export class Barricade extends ƒ.Node {
-        constructor() {
-            super("Barcode-Barrikade");
+    export class Barricade extends QuadNode {
+        private static count: number = 0;
+        constructor(_pos: ƒ.Vector2) {
+            let scale: ƒ.Vector2 = new ƒ.Vector2 (1, 1/12);
+            super("Barrikade" + (Barricade.count++), _pos, scale);
             let nStripes: number = 21;
 
 
@@ -17,7 +19,7 @@ namespace SpaceInvaders {
 
                 for (let iStripe: number = 0; iStripe < nStripes; iStripe++) {
                     let barricadeStripe: ƒ.Node = new ƒ.Node("BarricadeStripe" + (iStripe + iBarricade * nStripes));
-
+/*
                     let posX: number = iStripe - (nStripes - 1) / 2;
                     let scaleX: number = 1 / 12;
 
@@ -30,7 +32,7 @@ namespace SpaceInvaders {
                     barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.translateX(posX - (1 / 1000000000));
 
                     barricadeStripe.addComponent(new ƒ.ComponentMaterial(material));
-
+*/
                     barricade.addChild(barricadeStripe);
                 }
 

@@ -13,7 +13,9 @@ var SpaceInvaders;
     let flak = new SpaceInvaders.Flak();
     SpaceInvaders.space.addChild(projectileNode);
     SpaceInvaders.space.addChild(flak);
+    let barricades = new ƒ.Node("Barrikaden");
     let invaders = new ƒ.Node("Invaders");
+    let velocityInvaders = new ƒ.Vector2(0.5, 0);
     //export let motherShip: ƒ.Node = new ƒ.Node("MotherShip");
     //let node: ƒ.Node = new ƒ.Node("Test");
     function init(_event) {
@@ -33,7 +35,28 @@ var SpaceInvaders;
         }
         SpaceInvaders.space.addChild(invaders);
         new ƒ.Timer(ƒ.Time.game, 500, 0, moveInvaders);
-        let barricades = new SpaceInvaders.Barricade();
+        for (let iBarricade = 0; iBarricade < 4; iBarricade++) {
+            let barricade;
+            let nStripes = 21;
+            //    barricade.addComponent(new ƒ.ComponentTransform());
+            //    barricade.getComponent(ƒ.ComponentTransform).mtxLocal.translateX((iBarricade - 1.5) * 53 / 13);
+            //    barricade.getComponent(ƒ.ComponentTransform).mtxLocal.translateY(nStripes / 13);
+            for (let iStripe = 0; iStripe < nStripes; iStripe++) {
+                let barricadeStripe = new ƒ.Node("BarricadeStripe" + (iStripe + iBarricade * nStripes));
+                let pos = new ƒ.Vector2;
+                pos.x = iStripe - (nStripes - 1) / 2;
+                pos.y = 2;
+                // let scaleX: number = 1 / 12;
+                barricade = new SpaceInvaders.Barricade(pos);
+                //  barricadeStripe.addComponent(new ƒ.ComponentTransform());
+                //  barricadeStripe.getComponent(ƒ.ComponentTransform).mtxLocal.translateX(posX * scaleX);
+                //  barricadeStripe.getComponent(ƒ.ComponentTransform).mtxLocal.translateY(2.5);
+                //   barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.scaleX(scaleX);
+                //  barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.translateX(posX - (1 / 1000000000));
+                //                barricadeStripe.addComponent(new ƒ.ComponentMaterial(material));
+                barricade.addChild(barricadeStripe);
+            }
+        }
         SpaceInvaders.space.addChild(barricades);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
@@ -70,9 +93,19 @@ var SpaceInvaders;
         viewport.draw();
         moveInvaders();
     }
+    function checkBarricadeCollision() {
+        for (let projectile of projectileNode.getChildren()) {
+            for (let barricade of barricades.getChildren()) {
+                if (projectile.checkCollision(barricade)) {
+                    projectileNode.removeChild(projectile);
+                    barricades.removeChild(barricade);
+                    console.log("Tear down this Wall");
+                }
+            }
+        }
+    }
     function checkProjectileCollision() {
         for (let projectile of projectileNode.getChildren()) {
-            console.log(projectileNode.getChildren());
             for (let invader of invaders.getChildren()) {
                 if (projectile.checkCollision(invader)) {
                     projectileNode.removeChild(projectile);
@@ -83,14 +116,13 @@ var SpaceInvaders;
         }
     }
     function moveInvaders() {
+        invaders.mtxLocal.translate(velocityInvaders.toVector3());
         /*
-          invaders.mtxLocal.translate(velocityInvaders.toVector3());
-  
-          let mtcInverse: ƒ.Matrix4x4 =  ƒ.Matrix4x4.INVERSION(invaders.mtxLocal);
-          let position: ƒ.Vector3 = flak.mtxLocal.translation;
-          position.transform(mtxInverse, true);
-          console.log(position.toString());
-          */
+                let mtcInverse: ƒ.Matrix4x4 =  ƒ.Matrix4x4.INVERSION(invaders.mtxLocal);
+                let position: ƒ.Vector3 = flak.mtxLocal.translation;
+                position.transform(mtxInverse, true);
+                console.log(position.toString());
+                */
     }
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=SpaceInvaders.js.map

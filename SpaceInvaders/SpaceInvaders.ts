@@ -12,7 +12,9 @@ namespace SpaceInvaders {
     let flak: ƒ.Node = new Flak();
     space.addChild(projectileNode);
     space.addChild(flak);
+    let barricades: ƒ.Node = new ƒ.Node("Barrikaden");
     let invaders: ƒ.Node = new ƒ.Node("Invaders");
+    let velocityInvaders: ƒ.Vector2 = new ƒ.Vector2(0.5, 0);
 
     //export let motherShip: ƒ.Node = new ƒ.Node("MotherShip");
     //let node: ƒ.Node = new ƒ.Node("Test");
@@ -37,7 +39,35 @@ namespace SpaceInvaders {
 
          new ƒ.Timer(ƒ.Time.game, 500, 0, moveInvaders);
 
-        let barricades: ƒ.Node = new Barricade();
+         for (let iBarricade: number = 0; iBarricade < 4; iBarricade++) {
+            let barricade: ƒ.Node;
+
+            let nStripes: number = 21;
+
+        //    barricade.addComponent(new ƒ.ComponentTransform());
+        //    barricade.getComponent(ƒ.ComponentTransform).mtxLocal.translateX((iBarricade - 1.5) * 53 / 13);
+        //    barricade.getComponent(ƒ.ComponentTransform).mtxLocal.translateY(nStripes / 13);
+
+            for (let iStripe: number = 0; iStripe < nStripes; iStripe++) {
+                let barricadeStripe: ƒ.Node = new ƒ.Node("BarricadeStripe" + (iStripe + iBarricade * nStripes));
+                let pos: ƒ.Vector2 = new ƒ.Vector2;
+                pos.x = iStripe - (nStripes - 1) / 2;
+                pos.y = 2;
+               // let scaleX: number = 1 / 12;
+                barricade = new Barricade(pos);
+
+              //  barricadeStripe.addComponent(new ƒ.ComponentTransform());
+              //  barricadeStripe.getComponent(ƒ.ComponentTransform).mtxLocal.translateX(posX * scaleX);
+              //  barricadeStripe.getComponent(ƒ.ComponentTransform).mtxLocal.translateY(2.5);
+
+              //   barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.scaleX(scaleX);
+              //  barricadeStripe.getComponent(ƒ.ComponentMesh).mtxPivot.translateX(posX - (1 / 1000000000));
+
+//                barricadeStripe.addComponent(new ƒ.ComponentMaterial(material));
+
+                barricade.addChild(barricadeStripe);
+            }
+        }
         space.addChild(barricades);
 
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);
@@ -83,9 +113,19 @@ namespace SpaceInvaders {
         moveInvaders();
     }
 
+    function checkBarricadeCollision(): void{
+        for (let projectile of projectileNode.getChildren() as Projectile[]) {
+        for (let barricade of barricades.getChildren() as Barricade[]){
+            if (projectile.checkCollision(barricade)) {
+                projectileNode.removeChild(projectile);
+                barricades.removeChild(barricade);
+                console.log("Tear down this Wall");
+            }
+        }
+        }
+    }
     function checkProjectileCollision(): void {
         for (let projectile of projectileNode.getChildren() as Projectile[]) {
-            console.log(projectileNode.getChildren());
             for (let invader of invaders.getChildren() as Invader[]) {
                 if (projectile.checkCollision(invader)) {
                     projectileNode.removeChild(projectile);
@@ -97,15 +137,16 @@ namespace SpaceInvaders {
         }
     }
 
-    function moveInvaders(): void {
-      /*
-        invaders.mtxLocal.translate(velocityInvaders.toVector3());
 
+    function moveInvaders(): void {
+      
+        invaders.mtxLocal.translate(velocityInvaders.toVector3());
+/*
         let mtcInverse: ƒ.Matrix4x4 =  ƒ.Matrix4x4.INVERSION(invaders.mtxLocal);
         let position: ƒ.Vector3 = flak.mtxLocal.translation;
         position.transform(mtxInverse, true);
         console.log(position.toString());
-        */ 
+        */
     }
 
 }
