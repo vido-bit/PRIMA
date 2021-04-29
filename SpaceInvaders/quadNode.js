@@ -29,4 +29,4 @@ var SpaceInvaders;
     })();
     SpaceInvaders.QuadNode = QuadNode;
 })(SpaceInvaders || (SpaceInvaders = {}));
-//# sourceMappingURL=QuadNode.js.map
+//# sourceMappingURL=quadNode.js.map

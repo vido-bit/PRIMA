@@ -29,4 +29,4 @@ var SpaceInvaders;
     })();
     SpaceInvaders.SphereNode = SphereNode;
 })(SpaceInvaders || (SpaceInvaders = {}));
-//# sourceMappingURL=SphereNode.js.map
+//# sourceMappingURL=sphereNode.js.map
