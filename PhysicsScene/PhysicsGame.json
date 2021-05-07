@@ -58,7 +58,7 @@
         "children": [
           {
             "ƒ.Node": {
-              "name": "lvl",
+              "name": "level",
               "components": {},
               "children": [
                 {
