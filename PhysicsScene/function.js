@@ -8,9 +8,9 @@ var PhysicsScene;
     let environment = new Array();
     let player;
     let ball;
-    let ballBody;
     let cmpCamera;
     let isLocked = false;
+    let isGrabbed = false;
     // let isGrounded: boolean;
     let canvas;
     let camBufferX = 0;
@@ -18,8 +18,14 @@ var PhysicsScene;
     const camSpeed = -0.15;
     let forwardMovement = 0;
     let sideMovement = 0;
-    let audio = new ƒ.Audio("lo-fi-spahnwave-beats-to-relax_get-healthcare-systems-in-very-good-shape-to.mp3");
-    let audioNode = new ƒ.Node("Audio");
+    let grabSound = new ƒ.Audio("Slime_attack1.mp3"); //("lo-fi-spahnwave-beats-to-relax_get-healthcare-systems-in-very-good-shape-to.mp3");
+    let dropSound = new ƒ.Audio("Dolphin_eat1.ogg");
+    let audioGrabNode = new ƒ.Node("Grab");
+    let audioDropNode = new ƒ.Node("Drop");
+    let audioReleaseItem = new ƒ.Audio("Dolphin_eat1.ogg");
+    let cmpGrabSound = new ƒ.ComponentAudio(grabSound, false, false);
+    let cmpDropSound = new ƒ.ComponentAudio(dropSound, false, false);
+    let cmpRigidbody;
     async function init(_event) {
         //   ƒ.Physics.settings.debugDraw = true;
         ƒ.Physics.initializePhysics();
@@ -35,7 +41,6 @@ var PhysicsScene;
         canvas = document.querySelector("canvas");
         // hierarchy = new ƒ.Node("Scene");
         // player = graph.getChildrenByName("board")[0];
-        // console.log(player);
         // ball = graph.getChildrenByName("ball")[0];
         cmpCamera = new ƒ.ComponentCamera();
         player = new PhysicsScene.Player(cmpCamera);
@@ -63,31 +68,41 @@ var PhysicsScene;
         //lookAt(player.mtxLocal.translation);
         updateCam(camBufferX, camBufferY);
         player.move(forwardMovement, sideMovement);
-        console.log(player.cmpRigid.getPosition().y.toString());
         // if (player.cmpRigid.getPosition().y >= 2) {
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.E])) {
             tryGrab();
         }
-        //  if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.Q])) {
-        //       releaseItem();
-        //   }
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.Q])) {
+            releaseItem();
+        }
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.T])) {
+            console.log("Dropsound");
+            cmpDropSound.play(true);
+            cmpDropSound.volume = 1;
+        }
+        if (isGrabbed) {
+            cmpRigidbody.setVelocity(ƒ.Vector3.ZERO());
+            cmpRigidbody.setRotation(ƒ.Vector3.ZERO());
+            cmpRigidbody.setPosition(player.mtxWorld.translation);
+            ball.mtxWorld.translate(player.mtxWorld.translation);
+        }
         viewport.draw();
         ƒ.Physics.settings.debugDraw = true;
     }
     function createRigidBodies() {
         let level = root.getChildrenByName("level")[0];
         for (let node of level.getChildren()) {
-            let cmpRigidbody = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
+            let cmpRigidbody = new ƒ.ComponentRigidbody(9, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
             node.addComponent(cmpRigidbody);
             //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
         let moveables = root.getChildrenByName("moveables")[0];
+        ball = moveables.getChildrenByName("ball")[0];
         for (let node of moveables.getChildren()) {
-            let cmpRigidbody = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.DEFAULT);
+            cmpRigidbody = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.DEFAULT);
             cmpRigidbody.restitution = 0.8;
             cmpRigidbody.friction = 2.5;
             node.addComponent(cmpRigidbody);
-            // console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
     }
     function tryGrab() {
@@ -99,7 +114,9 @@ var PhysicsScene;
             let distance = ƒ.Vector3.DIFFERENCE(mtxPlayer.translation, node.mtxLocal.translation);
             if (distance.magnitude > 2)
                 continue;
-            pickup(node);
+            //     pickup(node);
+            isGrabbed = true;
+            cmpGrabSound.play(true);
             break;
         }
     }
@@ -110,26 +127,28 @@ var PhysicsScene;
         _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.KINEMATIC;
     }
     function releaseItem() {
-        let mtxPlayer = player.cmpRigid.getContainer().mtxLocal;
+        let playerContainer = player.cmpRigid.getContainer();
         // let rayHit: ƒ.RayHitInfo = ƒ.Physics.raycast(mtxAvatar.translation, mtxAvatar.getZ(), 4, ƒ.PHYSICS_GROUP.DEFAULT);
         // console.log(rayHit.hit);
         let moveables = root.getChildrenByName("moveables")[0];
         for (let node of moveables.getChildren()) {
+            isGrabbed = false;
+            cmpDropSound.play(true);
             //    let distance: ƒ.Vector3 = ƒ.Vector3.DIFFERENCE(mtxPlayer.translation, node.mtxLocal.translation);
             //    if (distance.magnitude > 2)
             //       continue;
-            dropOff(node);
+            //       dropOff(node);
             //   break;
         }
     }
     function dropOff(_node) {
         let playerContainer = player.cmpRigid.getContainer();
-        playerContainer.removeChild(_node);
+        playerContainer.removeAllChildren();
+        //playerContainer.removeChild(_node);
         _node.mtxLocal.set(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Z(-1.5)));
         // _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.KINEMATIC;
     }
     function startPlayerMovement(_event) {
-        console.log(player.direction);
         //   player.addComponent(new ƒ.ComponentTransform());
         if (_event.code == ƒ.KEYBOARD_CODE.W) {
             forwardMovement = 1;
@@ -184,11 +203,12 @@ var PhysicsScene;
     function setUpAudio() {
         let cmpListener = new ƒ.ComponentAudioListener();
         cmpCamera.getContainer().addComponent(cmpListener);
-        let cmpAudio = new ƒ.ComponentAudio(audio, false, false);
-        audioNode.addComponent(cmpAudio);
-        player.camNode.appendChild(audioNode);
+        audioGrabNode.addComponent(cmpGrabSound);
+        player.camNode.appendChild(audioGrabNode);
+        audioDropNode.addComponent(cmpDropSound);
+        player.camNode.appendChild(audioGrabNode);
         ƒ.AudioManager.default.listenWith(cmpListener);
-        ƒ.AudioManager.default.listenTo(audioNode);
+        ƒ.AudioManager.default.listenTo(audioGrabNode);
         ƒ.AudioManager.default.volume = 0.3;
         // ƒ.AudioManager.default.suspend();
     }
