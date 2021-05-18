@@ -4,7 +4,7 @@ var PhysicsScene;
     class Player extends ƒ.Node {
         constructor(_cmpCamera) {
             super("Player");
-            this.jumpForce = 120;
+            this.jumpForce = 50;
             this.camNode = new ƒ.Node("Cam");
             this.direction = ƒ.Vector3.ZERO();
             this.defaultSpeed = 5;
@@ -18,6 +18,7 @@ var PhysicsScene;
             let cmpTransform = new ƒ.ComponentTransform();
             cmpTransform.mtxLocal.scale(new ƒ.Vector3(1, 1, 1));
             cmpTransform.mtxLocal.translate(new ƒ.Vector3(0, 4, 0));
+            //   cmpTransform.mtxLocal.rotate(new ƒ.Vector3(0,90,0));
             this.addComponent(cmpTransform);
             //Rigid
             this.cmpRigid = new ƒ.ComponentRigidbody(this.weight, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CAPSULE, ƒ.PHYSICS_GROUP.DEFAULT);
@@ -65,4 +66,4 @@ var PhysicsScene;
     }
     PhysicsScene.Player = Player;
 })(PhysicsScene || (PhysicsScene = {}));
-//# sourceMappingURL=player.js.map
+//# sourceMappingURL=Player.js.map

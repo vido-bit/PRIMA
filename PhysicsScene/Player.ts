@@ -1,7 +1,7 @@
 namespace PhysicsScene {
     import ƒ = FudgeCore;
     export class Player extends ƒ.Node {
-        public jumpForce: number = 120;
+        public jumpForce: number = 50;
         public cmpCamera: ƒ.ComponentCamera;
         public cmpRigid: ƒ.ComponentRigidbody;
         public camNode: ƒ.Node = new ƒ.Node("Cam");
@@ -19,6 +19,7 @@ namespace PhysicsScene {
             let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform();
             cmpTransform.mtxLocal.scale(new ƒ.Vector3(1, 1, 1));
             cmpTransform.mtxLocal.translate(new ƒ.Vector3(0, 4, 0));
+         //   cmpTransform.mtxLocal.rotate(new ƒ.Vector3(0,90,0));
             this.addComponent(cmpTransform);
             //Rigid
             this.cmpRigid = new ƒ.ComponentRigidbody(this.weight, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CAPSULE, ƒ.PHYSICS_GROUP.DEFAULT);
