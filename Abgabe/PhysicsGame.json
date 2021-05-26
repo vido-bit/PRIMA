@@ -238,7 +238,7 @@
               },
               {
                 "ƒ.Node": {
-                  "name": "barrier",
+                  "name": "barrier01",
                   "components": {
                     "ComponentMesh": [
                       {
@@ -270,6 +270,20 @@
                             "active": true
                           },
                           "idMaterial": "Material|2021-05-11T15:32:44.945Z|02561"
+                        }
+                      }
+                    ],
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[5, 0.4000000059604645, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 2.499999523162842]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
                         }
                       }
                     ]
@@ -333,6 +347,88 @@
                           "Component": {
                             "active": true
                           }
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "cube01",
+                  "components": {
+                    "ComponentMesh": [
+                      {
+                        "ƒ.ComponentMesh": {
+                          "idMesh": "MeshCube|2021-04-27T14:50:55.663Z|74986",
+                          "pivot": {
+                            "translation": "[3, 1, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentMaterial": [
+                      {
+                        "ƒ.ComponentMaterial": {
+                          "sortForAlpha": false,
+                          "clrPrimary": "[1, 1, 1, 1]",
+                          "clrSecondary": "[1, 1, 1, 1]",
+                          "pivot": {
+                            "translation": "[0, 0]",
+                            "rotation": 0,
+                            "scaling": "[1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          },
+                          "idMaterial": "flatMat"
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "cube02",
+                  "components": {
+                    "ComponentMesh": [
+                      {
+                        "ƒ.ComponentMesh": {
+                          "idMesh": "MeshCube|2021-04-27T14:50:55.663Z|74986",
+                          "pivot": {
+                            "translation": "[-3, 1, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentMaterial": [
+                      {
+                        "ƒ.ComponentMaterial": {
+                          "sortForAlpha": false,
+                          "clrPrimary": "[1, 1, 1, 1]",
+                          "clrSecondary": "[1, 1, 1, 1]",
+                          "pivot": {
+                            "translation": "[0, 0]",
+                            "rotation": 0,
+                            "scaling": "[1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          },
+                          "idMaterial": "Material|2021-05-11T15:32:44.945Z|02561"
                         }
                       }
                     ]

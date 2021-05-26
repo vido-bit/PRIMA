@@ -9,6 +9,8 @@ namespace PhysicsScene {
     let environment: ƒ.Node[] = new Array();
     let player: Player;
     let ball: ƒ.Node;
+    let cube01: ƒ.Node;
+    let cube02: ƒ.Node;
     let cmpCamera: ƒ.ComponentCamera;
     let isLocked: boolean = false;
     let isGrabbed: boolean = false;
@@ -102,6 +104,8 @@ namespace PhysicsScene {
         }
         let moveables: ƒ.Node = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
+        cube01 = moveables.getChildrenByName("cube01")[0];
+        cube02 = moveables.getChildrenByName("cube01")[0];
         for (let node of moveables.getChildren()) {
             cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
             cmpRigidbodyBall.restitution = 0.8;

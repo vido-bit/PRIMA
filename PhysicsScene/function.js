@@ -25,7 +25,7 @@ var PhysicsScene;
     let audioReleaseItem = new ƒ.Audio("Dolphin_eat1.ogg");
     let cmpGrabSound = new ƒ.ComponentAudio(grabSound, false, false);
     let cmpDropSound = new ƒ.ComponentAudio(dropSound, false, false);
-    let cmpRigidbody;
+    let cmpRigidbodyBall;
     async function init(_event) {
         //   ƒ.Physics.settings.debugDraw = true;
         ƒ.Physics.initializePhysics();
@@ -81,9 +81,9 @@ var PhysicsScene;
             cmpDropSound.volume = 1;
         }
         if (isGrabbed) {
-            cmpRigidbody.setVelocity(ƒ.Vector3.ZERO());
-            cmpRigidbody.setRotation(ƒ.Vector3.ZERO());
-            cmpRigidbody.setPosition(player.mtxWorld.translation);
+            cmpRigidbodyBall.setVelocity(ƒ.Vector3.ZERO());
+            cmpRigidbodyBall.setRotation(ƒ.Vector3.ZERO());
+            cmpRigidbodyBall.setPosition(player.mtxWorld.translation);
             ball.mtxWorld.translate(player.mtxWorld.translation);
         }
         viewport.draw();
@@ -92,18 +92,19 @@ var PhysicsScene;
     function createRigidBodies() {
         let level = root.getChildrenByName("level")[0];
         for (let node of level.getChildren()) {
-            let cmpRigidbody = new ƒ.ComponentRigidbody(9, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
-            node.addComponent(cmpRigidbody);
+            let cmpRigidbodyLevel = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
+            node.addComponent(cmpRigidbodyLevel);
             //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
         let moveables = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
         for (let node of moveables.getChildren()) {
-            cmpRigidbody = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.DEFAULT);
-            cmpRigidbody.restitution = 0.8;
-            cmpRigidbody.friction = 2.5;
-            node.addComponent(cmpRigidbody);
+            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
+            cmpRigidbodyBall.restitution = 0.8;
+            cmpRigidbodyBall.friction = 2.5;
+            node.addComponent(cmpRigidbodyBall);
         }
+        //  ƒ.Physics.adjustTransforms(root, true);
     }
     function tryGrab() {
         let mtxPlayer = player.cmpRigid.getContainer().mtxLocal;
