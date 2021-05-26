@@ -1,9 +1,9 @@
 var PhysicsScene;
 (function (PhysicsScene) {
     var ƒ = FudgeCore;
-    class Player extends ƒ.Node {
+    class Character extends ƒ.Node {
         constructor(_cmpCamera) {
-            super("Player");
+            super("Character");
             this.jumpForce = 50;
             this.camNode = new ƒ.Node("Cam");
             this.direction = ƒ.Vector3.ZERO();
@@ -39,31 +39,31 @@ var PhysicsScene;
             /*
              constructor()
              
-             function createPlayer(): void {
-             playerBody = new ƒ.ComponentRigidbody(0.1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CAPSULE, ƒ.PHYSICS_GROUP.DEFAULT);
-             playerBody.restitution = 0.5;
-             playerBody.rotationInfluenceFactor = ƒ.Vector3.ZERO();
-             playerBody.friction = 1;
-             player = new ƒ.Node("player");
-             player.addComponent(new ƒ.ComponentTransform(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Y(3))));
-             player.addComponent(playerBody);
-             root.appendChild(player);
+             function createCharacter(): void {
+             CharacterBody = new ƒ.ComponentRigidbody(0.1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CAPSULE, ƒ.PHYSICS_GROUP.DEFAULT);
+             CharacterBody.restitution = 0.5;
+             CharacterBody.rotationInfluenceFactor = ƒ.Vector3.ZERO();
+             CharacterBody.friction = 1;
+             Character = new ƒ.Node("Character");
+             Character.addComponent(new ƒ.ComponentTransform(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Y(3))));
+             Character.addComponent(CharacterBody);
+             root.appendChild(Character);
          }
          */
         }
         move(_forward, _sideward) {
-            let playerForward = this.camNode.mtxLocal.getX();
-            let playerSideward = this.camNode.mtxLocal.getZ();
-            playerSideward.normalize();
-            playerForward.normalize();
+            let CharacterForward = this.camNode.mtxLocal.getX();
+            let CharacterSideward = this.camNode.mtxLocal.getZ();
+            CharacterSideward.normalize();
+            CharacterForward.normalize();
             let movementVel = new ƒ.Vector3();
-            movementVel.z = (playerForward.z * _forward + playerSideward.z * _sideward) * this.movementSpeed;
+            movementVel.z = (CharacterForward.z * _forward + CharacterSideward.z * _sideward) * this.movementSpeed;
             movementVel.y = this.cmpRigid.getVelocity().y;
-            movementVel.x = (playerForward.x * _forward + playerSideward.x * _sideward) * this.movementSpeed;
+            movementVel.x = (CharacterForward.x * _forward + CharacterSideward.x * _sideward) * this.movementSpeed;
             this.cmpRigid.setVelocity(movementVel);
             this.direction = movementVel;
         }
     }
-    PhysicsScene.Player = Player;
+    PhysicsScene.Character = Character;
 })(PhysicsScene || (PhysicsScene = {}));
 //# sourceMappingURL=Player.js.map

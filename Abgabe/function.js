@@ -28,6 +28,7 @@ var PhysicsScene;
     let cmpGrabSound = new ƒ.ComponentAudio(grabSound, false, false);
     let cmpDropSound = new ƒ.ComponentAudio(dropSound, false, false);
     let cmpRigidbodyBall;
+    let cmpRigidbodyCube;
     async function init(_event) {
         //   ƒ.Physics.settings.debugDraw = true;
         ƒ.Physics.initializePhysics();
@@ -45,7 +46,7 @@ var PhysicsScene;
         // player = graph.getChildrenByName("board")[0];
         // ball = graph.getChildrenByName("ball")[0];
         cmpCamera = new ƒ.ComponentCamera();
-        player = new PhysicsScene.Player(cmpCamera);
+        player = new PhysicsScene.Character(cmpCamera);
         root.addChild(player);
         createRigidBodies();
         setUpAudio();
@@ -59,7 +60,7 @@ var PhysicsScene;
         viewport = new ƒ.Viewport;
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         viewport.draw();
-        ƒ.Physics.adjustTransforms(root, true);
+        //ƒ.Physics.adjustTransforms(root, true);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start();
         //  ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);
@@ -83,9 +84,9 @@ var PhysicsScene;
             cmpDropSound.volume = 1;
         }
         if (isGrabbed) {
-            cmpRigidbodyBall.setVelocity(ƒ.Vector3.ZERO());
-            cmpRigidbodyBall.setRotation(ƒ.Vector3.ZERO());
-            cmpRigidbodyBall.setPosition(player.mtxWorld.translation);
+            cmpRigidbodyCube.setVelocity(ƒ.Vector3.ZERO());
+            cmpRigidbodyCube.setRotation(ƒ.Vector3.ZERO());
+            cmpRigidbodyCube.setPosition(player.mtxWorld.translation);
             ball.mtxWorld.translate(player.mtxWorld.translation);
         }
         viewport.draw();
@@ -99,16 +100,23 @@ var PhysicsScene;
             //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
         let moveables = root.getChildrenByName("moveables")[0];
-        ball = moveables.getChildrenByName("ball")[0];
-        cube01 = moveables.getChildrenByName("cube01")[0];
-        cube02 = moveables.getChildrenByName("cube01")[0];
+        //  cube01 = moveables.getChildrenByName("cube01")[0];
+        //   cube02 = moveables.getChildrenByName("cube01")[0];
         for (let node of moveables.getChildren()) {
-            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
-            cmpRigidbodyBall.restitution = 0.8;
-            cmpRigidbodyBall.friction = 2.5;
-            node.addComponent(cmpRigidbodyBall);
+            cmpRigidbodyCube = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_3);
+            cmpRigidbodyCube.restitution = 0.8;
+            cmpRigidbodyCube.friction = 2.5;
+            node.addComponent(cmpRigidbodyCube);
         }
         //  ƒ.Physics.adjustTransforms(root, true);
+        /*    ball = moveables.getChildrenByName("ball")[0];
+            for (let node of ball[0]) {
+                cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
+                cmpRigidbodyBall.restitution = 0.8;
+                cmpRigidbodyBall.friction = 2.5;
+                node.addComponent(cmpRigidbodyBall);
+            }
+            */
     }
     function tryGrab() {
         let mtxPlayer = player.cmpRigid.getContainer().mtxLocal;

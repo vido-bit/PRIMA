@@ -7,7 +7,7 @@ namespace PhysicsScene {
     let viewport: ƒ.Viewport; // = new ƒ.Viewport();
     //   let hierarchy: ƒ.Node;
     let environment: ƒ.Node[] = new Array();
-    let player: Player;
+    let player: Character;
     let ball: ƒ.Node;
     let cube01: ƒ.Node;
     let cube02: ƒ.Node;
@@ -29,6 +29,7 @@ namespace PhysicsScene {
     let cmpGrabSound: ƒ.ComponentAudio = new ƒ.ComponentAudio(grabSound, false, false);
     let cmpDropSound: ƒ.ComponentAudio = new ƒ.ComponentAudio(dropSound, false, false);
     let cmpRigidbodyBall: ƒ.ComponentRigidbody;
+    let cmpRigidbodyCube: ƒ.ComponentRigidbody;
     async function init(_event: Event): Promise<void> {
         //   ƒ.Physics.settings.debugDraw = true;
         ƒ.Physics.initializePhysics();
@@ -47,7 +48,7 @@ namespace PhysicsScene {
         // ball = graph.getChildrenByName("ball")[0];
 
         cmpCamera = new ƒ.ComponentCamera();
-        player = new Player(cmpCamera);
+        player = new Character(cmpCamera);
         root.addChild(player);
         createRigidBodies();
         setUpAudio();
@@ -61,7 +62,7 @@ namespace PhysicsScene {
         viewport = new ƒ.Viewport;
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         viewport.draw();
-        ƒ.Physics.adjustTransforms(root, true);
+        //ƒ.Physics.adjustTransforms(root, true);
         ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
         ƒ.Loop.start();
         //  ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);
@@ -87,9 +88,9 @@ namespace PhysicsScene {
             cmpDropSound.volume = 1;
         }
         if (isGrabbed) {
-            cmpRigidbodyBall.setVelocity(ƒ.Vector3.ZERO());
-            cmpRigidbodyBall.setRotation(ƒ.Vector3.ZERO());
-            cmpRigidbodyBall.setPosition(player.mtxWorld.translation);
+            cmpRigidbodyCube.setVelocity(ƒ.Vector3.ZERO());
+            cmpRigidbodyCube.setRotation(ƒ.Vector3.ZERO());
+            cmpRigidbodyCube.setPosition(player.mtxWorld.translation);
             ball.mtxWorld.translate(player.mtxWorld.translation);
         }
         viewport.draw();
@@ -103,16 +104,23 @@ namespace PhysicsScene {
             //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
         let moveables: ƒ.Node = root.getChildrenByName("moveables")[0];
-        ball = moveables.getChildrenByName("ball")[0];
-        cube01 = moveables.getChildrenByName("cube01")[0];
-        cube02 = moveables.getChildrenByName("cube01")[0];
+      //  cube01 = moveables.getChildrenByName("cube01")[0];
+     //   cube02 = moveables.getChildrenByName("cube01")[0];
         for (let node of moveables.getChildren()) {
+            cmpRigidbodyCube = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_3);
+            cmpRigidbodyCube.restitution = 0.8;
+            cmpRigidbodyCube.friction = 2.5;
+            node.addComponent(cmpRigidbodyCube);
+        }
+        //  ƒ.Physics.adjustTransforms(root, true);
+    /*    ball = moveables.getChildrenByName("ball")[0];
+        for (let node of ball[0]) {
             cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
             cmpRigidbodyBall.restitution = 0.8;
             cmpRigidbodyBall.friction = 2.5;
             node.addComponent(cmpRigidbodyBall);
         }
-        //  ƒ.Physics.adjustTransforms(root, true);
+        */
     }
 
     function tryGrab(): void {
