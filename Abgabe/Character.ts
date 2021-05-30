@@ -53,14 +53,16 @@ namespace Leveldesign {
          }
          */
         }
-        public move(_forward: number, _sideward: number): void {
+        public move(_forward: number, _sideward: number, _jumpward: number): void {
             let playerForward: ƒ.Vector3 = this.camNode.mtxLocal.getX();
             let playerSideward: ƒ.Vector3 = this.camNode.mtxLocal.getZ();
+            let playerjumpWard: ƒ.Vector3 = this.camNode.mtxLocal.getY();
             playerSideward.normalize();
             playerForward.normalize();
+            playerjumpWard.normalize();
             let movementVel: ƒ.Vector3 = new ƒ.Vector3();
             movementVel.z = (playerForward.z * _forward + playerSideward.z * _sideward) * this.movementSpeed;
-            movementVel.y = this.cmpRigid.getVelocity().y;
+            movementVel.y =  this.cmpRigid.getVelocity().y; //(playerjumpWard.y * _jumpward) * this.movementSpeed;
             movementVel.x = (playerForward.x * _forward + playerSideward.x * _sideward) * this.movementSpeed;
             this.cmpRigid.setVelocity(movementVel);
             this.direction = movementVel;

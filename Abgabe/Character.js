@@ -2,20 +2,18 @@ var Leveldesign;
 (function (Leveldesign) {
     var ƒ = FudgeCore;
     class Character extends ƒ.Node {
-        jumpForce = 50;
-        cmpCamera;
-        cmpRigid;
-        camNode = new ƒ.Node("Cam");
-        direction = ƒ.Vector3.ZERO();
-        defaultSpeed = 5;
-        movementSpeed = 5;
-        isGrounded = false;
-        weight = 75;
-        activeProp = null;
-        hasProp = false;
-        propRigid = null;
         constructor(_cmpCamera) {
             super("Character");
+            this.jumpForce = 50;
+            this.camNode = new ƒ.Node("Cam");
+            this.direction = ƒ.Vector3.ZERO();
+            this.defaultSpeed = 5;
+            this.movementSpeed = 5;
+            this.isGrounded = false;
+            this.weight = 75;
+            this.activeProp = null;
+            this.hasProp = false;
+            this.propRigid = null;
             //Transform
             let cmpTransform = new ƒ.ComponentTransform();
             cmpTransform.mtxLocal.scale(new ƒ.Vector3(1, 1, 1));
@@ -53,14 +51,16 @@ var Leveldesign;
          }
          */
         }
-        move(_forward, _sideward) {
+        move(_forward, _sideward, _jumpward) {
             let playerForward = this.camNode.mtxLocal.getX();
             let playerSideward = this.camNode.mtxLocal.getZ();
+            let playerjumpWard = this.camNode.mtxLocal.getY();
             playerSideward.normalize();
             playerForward.normalize();
+            playerjumpWard.normalize();
             let movementVel = new ƒ.Vector3();
             movementVel.z = (playerForward.z * _forward + playerSideward.z * _sideward) * this.movementSpeed;
-            movementVel.y = this.cmpRigid.getVelocity().y;
+            movementVel.y = this.cmpRigid.getVelocity().y; //(playerjumpWard.y * _jumpward) * this.movementSpeed;
             movementVel.x = (playerForward.x * _forward + playerSideward.x * _sideward) * this.movementSpeed;
             this.cmpRigid.setVelocity(movementVel);
             this.direction = movementVel;

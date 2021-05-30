@@ -20,6 +20,7 @@ var Leveldesign;
     const camSpeed = -0.15;
     let forwardMovement = 0;
     let sideMovement = 0;
+    let jumpMovement = 0;
     let grabSound = new ƒ.Audio("Slime_attack1.mp3"); //("lo-fi-spahnwave-beats-to-relax_get-healthcare-systems-in-very-good-shape-to.mp3");
     let dropSound = new ƒ.Audio("Dolphin_eat1.ogg");
     let audioGrabNode = new ƒ.Node("Grab");
@@ -69,7 +70,7 @@ var Leveldesign;
         ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
         //lookAt(player.mtxLocal.translation);
         updateCam(camBufferX, camBufferY);
-        character.move(forwardMovement, sideMovement);
+        character.move(forwardMovement, sideMovement, jumpMovement);
         // if (player.cmpRigid.getPosition().y >= 2) {
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.E])) {
             tryGrab();
@@ -169,10 +170,11 @@ var Leveldesign;
             sideMovement = 1;
         }
         if (_event.code == ƒ.KEYBOARD_CODE.SPACE) {
-            console.log("Y " + character.cmpRigid.getPosition().y);
-            if (character.cmpRigid.getPosition().y <= 5) {
-                character.cmpRigid.applyLinearImpulse(new ƒ.Vector3(0, character.jumpForce, 0));
-            }
+            console.log("Y " + character.camNode.mtxLocal.getY());
+            //   if (character.cmpRigid.getPosition().y <= 2) {
+            //jumpMovement = 1;
+            character.cmpRigid.applyLinearImpulse(new ƒ.Vector3(0, character.jumpForce, 0));
+            // }
         }
     }
     function stopPlayerMovement(_event) {
