@@ -1,4 +1,4 @@
-namespace PhysicsScene {
+namespace Leveldesign {
 
     import ƒ = FudgeCore;
 
@@ -7,10 +7,10 @@ namespace PhysicsScene {
     let viewport: ƒ.Viewport; // = new ƒ.Viewport();
     //   let hierarchy: ƒ.Node;
     let environment: ƒ.Node[] = new Array();
-    let player: Character;
-    let ball: ƒ.Node;
-    let cube01: ƒ.Node;
-    let cube02: ƒ.Node;
+    let character: Character;
+    let block: ƒ.Node;
+    let block02: ƒ.Node;
+    let grabbedBlock: ƒ.Node;
     let cmpCamera: ƒ.ComponentCamera;
     let isLocked: boolean = false;
     let isGrabbed: boolean = false;
@@ -28,8 +28,7 @@ namespace PhysicsScene {
     let audioReleaseItem: ƒ.Audio = new ƒ.Audio("Dolphin_eat1.ogg");
     let cmpGrabSound: ƒ.ComponentAudio = new ƒ.ComponentAudio(grabSound, false, false);
     let cmpDropSound: ƒ.ComponentAudio = new ƒ.ComponentAudio(dropSound, false, false);
-    let cmpRigidbodyBall: ƒ.ComponentRigidbody;
-    let cmpRigidbodyCube: ƒ.ComponentRigidbody;
+    let cmpRigidbodyBlock: ƒ.ComponentRigidbody;
     async function init(_event: Event): Promise<void> {
         //   ƒ.Physics.settings.debugDraw = true;
         ƒ.Physics.initializePhysics();
@@ -48,8 +47,8 @@ namespace PhysicsScene {
         // ball = graph.getChildrenByName("ball")[0];
 
         cmpCamera = new ƒ.ComponentCamera();
-        player = new Character(cmpCamera);
-        root.addChild(player);
+        character = new Character(cmpCamera);
+        root.addChild(character);
         createRigidBodies();
         setUpAudio();
         document.addEventListener("pointerlockchange", pointerLockChange);
@@ -62,7 +61,7 @@ namespace PhysicsScene {
         viewport = new ƒ.Viewport;
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         viewport.draw();
-        //ƒ.Physics.adjustTransforms(root, true);
+        ƒ.Physics.adjustTransforms(root, true);
         ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
         ƒ.Loop.start();
         //  ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);
@@ -73,7 +72,7 @@ namespace PhysicsScene {
         ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
         //lookAt(player.mtxLocal.translation);
         updateCam(camBufferX, camBufferY);
-        player.move(forwardMovement, sideMovement);
+        character.move(forwardMovement, sideMovement);
         // if (player.cmpRigid.getPosition().y >= 2) {
 
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.E])) {
@@ -88,50 +87,45 @@ namespace PhysicsScene {
             cmpDropSound.volume = 1;
         }
         if (isGrabbed) {
-            cmpRigidbodyCube.setVelocity(ƒ.Vector3.ZERO());
-            cmpRigidbodyCube.setRotation(ƒ.Vector3.ZERO());
-            cmpRigidbodyCube.setPosition(player.mtxWorld.translation);
-            ball.mtxWorld.translate(player.mtxWorld.translation);
+            cmpRigidbodyBlock.setVelocity(ƒ.Vector3.ZERO());
+            cmpRigidbodyBlock.setRotation(ƒ.Vector3.ZERO());
+            cmpRigidbodyBlock.setPosition(character.mtxWorld.translation);
+            block02.mtxWorld.translate(character.mtxWorld.translation);
         }
         viewport.draw();
         ƒ.Physics.settings.debugDraw = true;
     }
     function createRigidBodies(): void {
-        let level: ƒ.Node = root.getChildrenByName("level")[0];
+        let level: ƒ.Node = root.getChildrenByName("level01")[0];
         for (let node of level.getChildren()) {
             let cmpRigidbodyLevel: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
             node.addComponent(cmpRigidbodyLevel);
             //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
         let moveables: ƒ.Node = root.getChildrenByName("moveables")[0];
-      //  cube01 = moveables.getChildrenByName("cube01")[0];
-     //   cube02 = moveables.getChildrenByName("cube01")[0];
+        block = moveables.getChildrenByName("cube")[0];
+        block02 = moveables.getChildrenByName("cube02")[0];
         for (let node of moveables.getChildren()) {
-            cmpRigidbodyCube = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_3);
-            cmpRigidbodyCube.restitution = 0.8;
-            cmpRigidbodyCube.friction = 2.5;
-            node.addComponent(cmpRigidbodyCube);
+            cmpRigidbodyBlock = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
+            cmpRigidbodyBlock.restitution = 0.8;
+            cmpRigidbodyBlock.friction = 2.5;
+            node.addComponent(cmpRigidbodyBlock);
         }
         //  ƒ.Physics.adjustTransforms(root, true);
-    /*    ball = moveables.getChildrenByName("ball")[0];
-        for (let node of ball[0]) {
-            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
-            cmpRigidbodyBall.restitution = 0.8;
-            cmpRigidbodyBall.friction = 2.5;
-            node.addComponent(cmpRigidbodyBall);
-        }
-        */
     }
 
     function tryGrab(): void {
-        let mtxPlayer: ƒ.Matrix4x4 = player.cmpRigid.getContainer().mtxLocal;
+        let mtxPlayer: ƒ.Matrix4x4 = character.cmpRigid.getContainer().mtxLocal;
         // let rayHit: ƒ.RayHitInfo = ƒ.Physics.raycast(mtxAvatar.translation, mtxAvatar.getZ(), 4, ƒ.PHYSICS_GROUP.DEFAULT);
         // console.log(rayHit.hit);
         let moveables: ƒ.Node = root.getChildrenByName("moveables")[0];
         for (let node of moveables.getChildren()) {
             let distance: ƒ.Vector3 = ƒ.Vector3.DIFFERENCE(mtxPlayer.translation, node.mtxLocal.translation);
             if (distance.magnitude > 2)
+
                 continue;
+            grabbedBlock = this.node;
+            console.log("grabbed Block " + grabbedBlock);
             //     pickup(node);
             isGrabbed = true;
             cmpGrabSound.play(true);
@@ -142,14 +136,14 @@ namespace PhysicsScene {
 
 
     function pickup(_node: ƒ.Node): void {
-        let playerContainer: ƒ.Node = player.cmpRigid.getContainer();
+        let playerContainer: ƒ.Node = character.cmpRigid.getContainer();
         playerContainer.appendChild(_node);
         _node.mtxLocal.set(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Z(1.5)));
         _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.KINEMATIC;
     }
 
     function releaseItem(): void {
-        let playerContainer: ƒ.Node = player.cmpRigid.getContainer();
+        let playerContainer: ƒ.Node = character.cmpRigid.getContainer();
         // let rayHit: ƒ.RayHitInfo = ƒ.Physics.raycast(mtxAvatar.translation, mtxAvatar.getZ(), 4, ƒ.PHYSICS_GROUP.DEFAULT);
         // console.log(rayHit.hit);
         let moveables: ƒ.Node = root.getChildrenByName("moveables")[0];
@@ -164,7 +158,7 @@ namespace PhysicsScene {
         }
     }
     function dropOff(_node: ƒ.Node): void {
-        let playerContainer: ƒ.Node = player.cmpRigid.getContainer();
+        let playerContainer: ƒ.Node = character.cmpRigid.getContainer();
         playerContainer.removeAllChildren();
         //playerContainer.removeChild(_node);
         _node.mtxLocal.set(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Z(-1.5)));
@@ -189,8 +183,9 @@ namespace PhysicsScene {
         }
 
         if (_event.code == ƒ.KEYBOARD_CODE.SPACE) {
-            if (player.cmpRigid.getPosition().y <= 2) {
-                player.cmpRigid.applyLinearImpulse(new ƒ.Vector3(0, player.jumpForce, 0));
+            console.log("Y " + character.cmpRigid.getPosition().y);
+            if (character.cmpRigid.getPosition().y <= 5) {
+                character.cmpRigid.applyLinearImpulse(new ƒ.Vector3(0, character.jumpForce, 0));
             }
         }
     }
@@ -226,8 +221,8 @@ namespace PhysicsScene {
         }
     }
     function updateCam(_x: number, _y: number): void {
-        player.camNode.mtxLocal.rotateZ(_y * camSpeed);
-        player.camNode.mtxLocal.rotateY(_x * camSpeed, true);
+        character.camNode.mtxLocal.rotateZ(_y * camSpeed);
+        character.camNode.mtxLocal.rotateY(_x * camSpeed, true);
         camBufferX = 0;
         camBufferY = 0;
     }
@@ -235,9 +230,9 @@ namespace PhysicsScene {
         let cmpListener: ƒ.ComponentAudioListener = new ƒ.ComponentAudioListener();
         cmpCamera.getContainer().addComponent(cmpListener);
         audioGrabNode.addComponent(cmpGrabSound);
-        player.camNode.appendChild(audioGrabNode);
+        character.camNode.appendChild(audioGrabNode);
         audioDropNode.addComponent(cmpDropSound);
-        player.camNode.appendChild(audioGrabNode);
+        character.camNode.appendChild(audioGrabNode);
         ƒ.AudioManager.default.listenWith(cmpListener);
         ƒ.AudioManager.default.listenTo(audioGrabNode);
         ƒ.AudioManager.default.volume = 0.3;
