@@ -93,71 +93,23 @@
       "children": [
         {
           "ƒ.Node": {
-            "name": "moveables",
-            "components": {},
-            "children": [
-              {
-                "ƒ.Node": {
-                  "name": "ball",
-                  "components": {
-                    "ComponentMesh": [
-                      {
-                        "ƒ.ComponentMesh": {
-                          "idMesh": "MeshSphere|2021-05-30T21:48:38.149Z|04177",
-                          "pivot": {
-                            "translation": "[0, 0, 0]",
-                            "rotation": "[0, 0, 0]",
-                            "scaling": "[1, 1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          }
-                        }
-                      }
-                    ],
-                    "ComponentMaterial": [
-                      {
-                        "ƒ.ComponentMaterial": {
-                          "sortForAlpha": false,
-                          "clrPrimary": "[1, 1, 1, 1]",
-                          "clrSecondary": "[1, 1, 1, 1]",
-                          "pivot": {
-                            "translation": "[0, 0]",
-                            "rotation": 0,
-                            "scaling": "[1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          },
-                          "idMaterial": "Material|2021-05-30T21:25:47.296Z|40065"
-                        }
-                      }
-                    ],
-                    "ComponentTransform": [
-                      {
-                        "ƒ.ComponentTransform": {
-                          "local": {
-                            "translation": "[0, 2, 0]",
-                            "rotation": "[0, 0, 0]",
-                            "scaling": "[1, 1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "children": []
-                }
-              }
-            ]
-          }
-        },
-        {
-          "ƒ.Node": {
             "name": "environment",
-            "components": {},
+            "components": {
+              "ComponentTransform": [
+                {
+                  "ƒ.ComponentTransform": {
+                    "local": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ]
+            },
             "children": [
               {
                 "ƒ.Node": {
@@ -390,7 +342,22 @@
               {
                 "ƒ.Node": {
                   "name": "level1",
-                  "components": {},
+                  "components": {
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 0, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ]
+                  },
                   "children": [
                     {
                       "ƒ.Node": {
@@ -511,6 +478,84 @@
                       }
                     }
                   ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "ƒ.Node": {
+            "name": "moveables",
+            "components": {
+              "ComponentTransform": [
+                {
+                  "ƒ.ComponentTransform": {
+                    "local": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ]
+            },
+            "children": [
+              {
+                "ƒ.Node": {
+                  "name": "ball",
+                  "components": {
+                    "ComponentMesh": [
+                      {
+                        "ƒ.ComponentMesh": {
+                          "idMesh": "MeshSphere|2021-05-30T21:48:38.149Z|04177",
+                          "pivot": {
+                            "translation": "[0, 0, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentMaterial": [
+                      {
+                        "ƒ.ComponentMaterial": {
+                          "sortForAlpha": false,
+                          "clrPrimary": "[1, 1, 1, 1]",
+                          "clrSecondary": "[1, 1, 1, 1]",
+                          "pivot": {
+                            "translation": "[0, 0]",
+                            "rotation": 0,
+                            "scaling": "[1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          },
+                          "idMaterial": "Material|2021-05-30T21:25:47.296Z|40065"
+                        }
+                      }
+                    ],
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 2, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
                 }
               }
             ]
