@@ -1,7 +1,7 @@
 namespace Labyrinth {
   import ƒ = FudgeCore;
   let root: ƒ.Graph;
-  let environment: ƒ.Node;
+  let environment: ƒ.Node; // = new NeigePlattorm;
   let level1: ƒ.Node;
   let moveables: ƒ.Node;
   let ball: ƒ.Node;
@@ -86,26 +86,41 @@ namespace Labyrinth {
 
     ƒ.Physics.settings.debugDraw = true;
 
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
-      cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((45 / ƒ.Loop.timeFrameGame) / 10));
+    let neigbarX: boolean = false;
+    if (environment.mtxWorld.rotation.x < 15 && environment.mtxWorld.rotation.x > -15)
+      neigbarX = true;
+    let neigbarZ: boolean = false;
+    if (environment.mtxWorld.rotation.z < 15 && environment.mtxWorld.rotation.z > -15)
+      neigbarZ = true;
+
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]) && (neigbarX == true)) {
+      cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((-45 / ƒ.Loop.timeFrameGame) / 10));
+      console.log(environment.mtxWorld.rotation.toString());
       //console.log(environment.mtxWorld.rotation.toString());
       gameState.level--;
     }
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D])) {
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]) && (neigbarX == true)) {
+      cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((45 / ƒ.Loop.timeFrameGame) / 10));
+    }
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]) && (neigbarZ == true)) {
       //environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
       cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((-45 / ƒ.Loop.timeFrameGame) / 10));
       console.log(environment);
-      cmpRigidbodyBall.applyForce(ƒ.Vector3.Y(50));
+      // cmpRigidbodyBall.applyForce(ƒ.Vector3.Y(50));
 
       gameState.level++;
       //console.log(cmpCamera.mtxPivot);
+    }
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]) && (neigbarX == true)) {
+      //environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
+      cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((45 / ƒ.Loop.timeFrameGame) / 10));
     }
     viewport.draw();
   }
 
   function setUpCam(): void {
 
-    cmpCamera.mtxPivot.translate(new ƒ.Vector3(45, 25, -8));
+    cmpCamera.mtxPivot.translate(new ƒ.Vector3(15, 40, -10));
     cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
 
   }
@@ -126,23 +141,23 @@ namespace Labyrinth {
     );
     environment = root.getChild(0);
     environment.addComponent(cmpRigidbodyEnv);
-    // level1 = environment.getChildrenByName("level1")[0];
-    // floor1 = level1.getChildrenByName("floor1")[0];
-    // let floor11: ƒ.Node = floor1.getChildrenByName("floor11")[0];
-    // floor11.addComponent(cmpRigidbodyFloor11);
-    // let floor12: ƒ.Node = floor1.getChildrenByName("floor12")[0];
-    // floor12.addComponent(cmpRigidbodyFloor12);
-    // let barriers: ƒ.Node = environment.getChildrenByName("barriers")[0];
-    // for (let node of barriers.getChildren()) {
-    //   let cmpRigidbodyBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-    //     2,
-    //     ƒ.PHYSICS_TYPE.STATIC,
-    //     ƒ.COLLIDER_TYPE.CUBE,
-    //     ƒ.PHYSICS_GROUP.GROUP_2
-    //   );
-    //   node.addComponent(cmpRigidbodyBarrier);
-    //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
-    // }
+    level1 = environment.getChildrenByName("level1")[0];
+    floor1 = level1.getChildrenByName("floor1")[0];
+    let floor11: ƒ.Node = floor1.getChildrenByName("floor11")[0];
+    floor11.addComponent(cmpRigidbodyFloor11);
+    let floor12: ƒ.Node = floor1.getChildrenByName("floor12")[0];
+    floor12.addComponent(cmpRigidbodyFloor12);
+    let barriers: ƒ.Node = environment.getChildrenByName("barriers")[0];
+    for (let node of barriers.getChildren()) {
+      let cmpRigidbodyBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
+        2,
+        ƒ.PHYSICS_TYPE.KINEMATIC,
+        ƒ.COLLIDER_TYPE.CUBE,
+        ƒ.PHYSICS_GROUP.GROUP_2
+      );
+      node.addComponent(cmpRigidbodyBarrier);
+      console.log(node.name, node.cmpTransform?.mtxLocal.toString());
+    }
 
 
     for (let node of moveables.getChildren()) {

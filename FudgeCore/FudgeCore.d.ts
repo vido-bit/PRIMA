@@ -2527,6 +2527,7 @@ declare namespace FudgeCore {
      * @authors Jascha Karagöl, HFU, 2019 | Jirka Dell'Oro-Friedl, HFU, 2020
      */
     class Matrix3x3 extends Mutable implements Serializable {
+        private static deg2rad;
         private data;
         private mutator;
         private vectors;
@@ -2644,6 +2645,7 @@ declare namespace FudgeCore {
      * @authors Jascha Karagöl, HFU, 2019 | Jirka Dell'Oro-Friedl, HFU, 2019
      */
     export class Matrix4x4 extends Mutable implements Serializable {
+        private static deg2rad;
         private data;
         private mutator;
         private vectors;
@@ -2683,7 +2685,6 @@ declare namespace FudgeCore {
         static TRANSLATION(_translate: Vector3): Matrix4x4;
         /**
          * Returns a matrix that rotates coordinates on the x-axis when multiplied by.
-         * @param _angleInDegrees The value of the rotation.
          */
         static ROTATION_X(_angleInDegrees: number): Matrix4x4;
         /**
@@ -2692,9 +2693,13 @@ declare namespace FudgeCore {
         static ROTATION_Y(_angleInDegrees: number): Matrix4x4;
         /**
          * Returns a matrix that rotates coordinates on the z-axis when multiplied by.
-         * @param _angleInDegrees The value of the rotation.
          */
         static ROTATION_Z(_angleInDegrees: number): Matrix4x4;
+        /**
+         * Returns a matrix that rotates coordinates when multiplied by, using the angles given.
+         * Rotation occurs around the axis in the order Z-Y-X .
+         */
+        static ROTATION(_eulerAnglesInDegrees: Vector3): Matrix4x4;
         /**
          * Returns a matrix that scales coordinates along the x-, y- and z-axis according to the given vector
          */
@@ -2859,7 +2864,7 @@ declare namespace FudgeCore {
         protected reduceMutator(_mutator: Mutator): void;
         private resetCache;
     }
-    export {};
+    export { };
 }
 declare namespace FudgeCore {
     /**
@@ -4567,7 +4572,9 @@ declare namespace FudgeCore {
         /** Compile a shader out of a string and validate it. */
         compileShader(shader: WebGLShader, source: string): void;
     }
-    /** Internal Class used to draw debugInformations about the physics simulation onto the renderContext. No user interaction needed. @author Marko Fehrenbach, HFU 2020 //Based on OimoPhysics Haxe DebugDrawDemo */
+    /** Internal Class used to draw debugInformations about the physics simulation onto the renderContext. No user interaction needed.
+     * @author Marko Fehrenbach, HFU 2020 //Based on OimoPhysics Haxe DebugDrawDemo
+     */
     class PhysicsDebugDraw extends RenderWebGL {
         oimoDebugDraw: OIMO.DebugDraw;
         style: OIMO.DebugDrawStyle;
@@ -4601,9 +4608,9 @@ declare namespace FudgeCore {
          * Needs to create empty buffers to already have them ready to draw later on, linking is only possible with existing buffers. */
         initializeBuffers(): void;
         /** Before OimoPhysics.world is filling the debug. Make sure the buffers are reset. Also receiving the debugMode from settings and updating the current projection for the vertexShader. */
-        begin(): void;
+        clearBuffers(): void;
         /** After OimoPhysics.world filled the debug. Rendering calls. Setting this program to be used by the Fudge rendering context. And draw each updated buffer and resetting them. */
-        end(): void;
+        drawBuffers(): void;
         /** Drawing the ray into the debugDraw Call. By using the overwritten line rendering functions and drawing a point (pointSize defined in the shader) at the end of the ray. */
         debugRay(_origin: Vector3, _end: Vector3, _color: Color): void;
         /** Overriding the existing functions from OimoPhysics.DebugDraw without actually inherit from the class, to avoid compiler problems.
@@ -4831,6 +4838,7 @@ declare namespace FudgeCore {
         * Simulates the physical world. _deltaTime is the amount of time between physical steps, default is 60 frames per second ~17ms
         */
         simulate(_deltaTime?: number): void;
+        draw(_cmpCamera: ComponentCamera): void;
         /** Make the given ComponentRigidbody known to the world as a body that is not colliding, but only triggering events. Used internally no interaction needed. */
         registerTrigger(_rigidbody: ComponentRigidbody): void;
         /** Remove the given ComponentRigidbody the world as viable triggeringBody. Used internally no interaction needed. */
@@ -5032,10 +5040,6 @@ declare namespace FudgeCore {
         static draw(_cmpCamera: ComponentCamera): void;
         private static drawListAlpha;
         private static drawList;
-        /**
-        * Physics Part -> Take all nodes with cmpRigidbody, and overwrite their local position/rotation with the one coming from
-        * the rb component, which is the new "local" WORLD position.
-        */
         private static transformByPhysics;
     }
 }
