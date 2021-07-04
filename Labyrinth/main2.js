@@ -9,7 +9,7 @@ var Labyrinth;
     let cmpRigidbodyBall;
     let floor1;
     let camPosition = new ƒ.Vector3(1, 10, 2);
-    let cmpRigidbodyEnv = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
+    let cmpRigidbodyEnv = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
     let cmpCamera = new ƒ.ComponentCamera();
     let viewport = new ƒ.Viewport();
     let ballBearing;
@@ -112,10 +112,10 @@ var Labyrinth;
         cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
     }
     function createRigidBodies() {
-        cmpRigidBearing = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_1);
+        cmpRigidBearing = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.DEFAULT);
         ballBearing.addComponent(cmpRigidBearing);
-        let cmpRigidbodyFloor11 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
-        let cmpRigidbodyFloor12 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
+        let cmpRigidbodyFloor11 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
+        let cmpRigidbodyFloor12 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
         environment = root.getChild(0);
         environment.addComponent(cmpRigidbodyEnv);
         //environmentTransform = environment.getComponent(ƒ.ComponentTransform);
@@ -128,12 +128,12 @@ var Labyrinth;
         floor12.addComponent(cmpRigidbodyFloor12);
         let barriers = environment.getChildrenByName("barriers")[0];
         for (let node of barriers.getChildren()) {
-            let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
+            let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
             node.addComponent(cmpRigidbodyBarrier);
             //  console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
         for (let node of moveables.getChildren()) {
-            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
+            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
             cmpRigidbodyBall.restitution = 0.8;
             cmpRigidbodyBall.friction = 2.5;
             node.addComponent(cmpRigidbodyBall);
@@ -141,7 +141,8 @@ var Labyrinth;
     }
     function settingUpJoint() {
         sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyEnv);
-        environmentTransform.getContainer().addComponent(sphericalJoint);
+        // environmentTransform.getContainer().addComponent(sphericalJoint);
+        environment.addComponent(sphericalJoint);
         sphericalJoint.springDamping = 0.1;
         sphericalJoint.springFrequency = 1;
     }

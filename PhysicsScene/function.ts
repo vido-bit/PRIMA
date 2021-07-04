@@ -103,7 +103,7 @@ namespace PhysicsScene {
         let moveables: ƒ.Node = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
         for (let node of moveables.getChildren()) {
-            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
+            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
             cmpRigidbodyBall.restitution = 0.8;
             cmpRigidbodyBall.friction = 2.5;
             node.addComponent(cmpRigidbodyBall);
@@ -133,7 +133,7 @@ namespace PhysicsScene {
         let playerContainer: ƒ.Node = player.cmpRigid.getContainer();
         playerContainer.appendChild(_node);
         _node.mtxLocal.set(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Z(1.5)));
-        _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.KINEMATIC;
+        _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.STATIC;
     }
 
     function releaseItem(): void {

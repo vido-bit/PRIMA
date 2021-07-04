@@ -10,7 +10,7 @@ namespace Labyrinth {
     let camPosition: ƒ.Vector3 = new ƒ.Vector3(1, 10, 2);
     let cmpRigidbodyEnv: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
         0,
-        ƒ.PHYSICS_TYPE.DYNAMIC,
+        ƒ.PHYSICS_TYPE.STATIC,
         ƒ.COLLIDER_TYPE.CUBE,
         ƒ.PHYSICS_GROUP.GROUP_2
     );
@@ -134,19 +134,19 @@ namespace Labyrinth {
         cmpRigidBearing = new ƒ.ComponentRigidbody(
             1, ƒ.PHYSICS_TYPE.STATIC,
             ƒ.COLLIDER_TYPE.SPHERE,
-            ƒ.PHYSICS_GROUP.GROUP_1
+            ƒ.PHYSICS_GROUP.DEFAULT
         );
         ballBearing.addComponent(cmpRigidBearing);
 
         let cmpRigidbodyFloor11: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
             2,
-            ƒ.PHYSICS_TYPE.KINEMATIC,
+            ƒ.PHYSICS_TYPE.STATIC,
             ƒ.COLLIDER_TYPE.CUBE,
             ƒ.PHYSICS_GROUP.DEFAULT
         );
         let cmpRigidbodyFloor12: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
             2,
-            ƒ.PHYSICS_TYPE.KINEMATIC,
+            ƒ.PHYSICS_TYPE.STATIC,
             ƒ.COLLIDER_TYPE.CUBE,
             ƒ.PHYSICS_GROUP.DEFAULT
         );
@@ -164,7 +164,7 @@ namespace Labyrinth {
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
                 2,
-                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.PHYSICS_TYPE.STATIC,
                 ƒ.COLLIDER_TYPE.CUBE,
                 ƒ.PHYSICS_GROUP.GROUP_2
             );
@@ -176,7 +176,7 @@ namespace Labyrinth {
         for (let node of moveables.getChildren()) {
             cmpRigidbodyBall = new ƒ.ComponentRigidbody(
                 1,
-                ƒ.PHYSICS_TYPE.DYNAMIC,
+                ƒ.PHYSICS_TYPE.STATIC,
                 ƒ.COLLIDER_TYPE.SPHERE,
                 ƒ.PHYSICS_GROUP.GROUP_2
             );
@@ -187,7 +187,8 @@ namespace Labyrinth {
     }
     function settingUpJoint(): void {
         sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyEnv);
-        environmentTransform.getContainer().addComponent(sphericalJoint);
+        // environmentTransform.getContainer().addComponent(sphericalJoint);
+        environment.addComponent(sphericalJoint);
         sphericalJoint.springDamping = 0.1;
         sphericalJoint.springFrequency = 1;
     }

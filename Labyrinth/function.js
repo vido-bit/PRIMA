@@ -96,7 +96,7 @@ var Labyrinth;
     function createRigidBodies() {
         let level = root.getChildrenByName("level01")[0];
         for (let node of level.getChildren()) {
-            let cmpRigidbodyLevel = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
+            let cmpRigidbodyLevel = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
             node.addComponent(cmpRigidbodyLevel);
             //   console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }

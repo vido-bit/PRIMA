@@ -109,7 +109,7 @@ namespace Labyrinth {
     for (let node of level.getChildren()) {
       let cmpRigidbodyLevel: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
         0,
-        ƒ.PHYSICS_TYPE.STATIC,
+        ƒ.PHYSICS_TYPE.DYNAMIC,
         ƒ.COLLIDER_TYPE.CUBE,
         ƒ.PHYSICS_GROUP.DEFAULT
       );

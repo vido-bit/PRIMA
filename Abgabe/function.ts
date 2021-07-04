@@ -107,7 +107,7 @@ namespace Leveldesign {
         block = moveables.getChildrenByName("cube")[0];
         block02 = moveables.getChildrenByName("cube02")[0];
         for (let node of moveables.getChildren()) {
-            cmpRigidbodyBlock = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
+            cmpRigidbodyBlock = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
             cmpRigidbodyBlock.restitution = 0.8;
             cmpRigidbodyBlock.friction = 2.5;
             node.addComponent(cmpRigidbodyBlock);
@@ -140,7 +140,7 @@ namespace Leveldesign {
         let playerContainer: ƒ.Node = character.cmpRigid.getContainer();
         playerContainer.appendChild(_node);
         _node.mtxLocal.set(ƒ.Matrix4x4.TRANSLATION(ƒ.Vector3.Z(1.5)));
-        _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.KINEMATIC;
+        _node.getComponent(ƒ.ComponentRigidbody).physicsType = ƒ.PHYSICS_TYPE.STATIC;
     }
 
     function releaseItem(): void {
