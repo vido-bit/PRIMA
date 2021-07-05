@@ -49,7 +49,7 @@ var Labyrinth;
         viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
         ƒ.Debug.log("Viewport:", viewport);
         createRigidBodies();
-        settingUpJoints();
+        //settingUpJoints();
         ƒ.Physics.adjustTransforms(root, true);
         // hide the cursor when interacting, also suppressing right-click menu
         canvas.addEventListener("mousedown", canvas.requestPointerLock);
@@ -118,8 +118,8 @@ var Labyrinth;
     }
     function createRigidBodies() {
         environment = root.getChildrenByName("environment")[0];
-        ballBearing = environment.getChildrenByName("ballBearing")[0];
-        fixplate = environment.getChildrenByName("fixplate")[0];
+        ballBearing = root.getChildrenByName("ballBearing")[0];
+        fixplate = root.getChildrenByName("fixplate")[0];
         floor01 = environment.getChildrenByName("floor01")[0];
         barriers = floor01.getChildrenByName("barriers")[0];
         level1 = floor01.getChildrenByName("level1")[0];
@@ -137,14 +137,11 @@ var Labyrinth;
         for (let node of barriers.getChildren()) {
             cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
             node.addComponent(cmpRigidbodyBarrier);
-            //  console.log(node.name, node.cmpTransform?.mtxLocal.toString());
         }
-        for (let node of moveables.getChildren()) {
-            cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
-            cmpRigidbodyBall.restitution = 0.8;
-            cmpRigidbodyBall.friction = 2.5;
-            node.addComponent(cmpRigidbodyBall);
-        }
+        let cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
+        cmpRigidbodyBall.restitution = 0.8;
+        cmpRigidbodyBall.friction = 2.5;
+        ball.addComponent(cmpRigidbodyBall);
         // cmpRigidbodyEnv = new ƒ.ComponentRigidbody(
         //   4,
         //   ƒ.PHYSICS_TYPE.DYNAMIC,
@@ -155,9 +152,9 @@ var Labyrinth;
     }
     //let barrierJoint: ƒ.ComponentJointRevolute;
     function settingUpJoints() {
-        sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyFloor01);
+        sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyEnv);
         // environmentTransform.getContainer().addComponent(sphericalJoint);
-        floor01.addComponent(sphericalJoint);
+        environment.addComponent(sphericalJoint);
         sphericalJoint.springDamping = 1;
         sphericalJoint.springFrequency = 1;
         //  ƒ.Physics.adjustTransforms(environment, true);
@@ -223,7 +220,7 @@ var Labyrinth;
             console.log("G is pressed");
         }
         if (_event.code == ƒ.KEYBOARD_CODE.A) {
-            cmpRigidbodyFloor01.rotateBody(ƒ.Vector3.X((-45 / ƒ.Loop.timeFrameGame) / 10));
+            cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((-45 / ƒ.Loop.timeFrameGame) / 10));
         }
     }
 })(Labyrinth || (Labyrinth = {}));
