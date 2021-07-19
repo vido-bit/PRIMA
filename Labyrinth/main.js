@@ -49,7 +49,7 @@ var Labyrinth;
         viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
         ƒ.Debug.log("Viewport:", viewport);
         createRigidBodies();
-        //settingUpJoints();
+        settingUpJoints();
         ƒ.Physics.adjustTransforms(root, true);
         // hide the cursor when interacting, also suppressing right-click menu
         canvas.addEventListener("mousedown", canvas.requestPointerLock);
@@ -152,9 +152,9 @@ var Labyrinth;
     }
     //let barrierJoint: ƒ.ComponentJointRevolute;
     function settingUpJoints() {
-        sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyEnv);
+        sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyFloor01);
         // environmentTransform.getContainer().addComponent(sphericalJoint);
-        environment.addComponent(sphericalJoint);
+        floor01.addComponent(sphericalJoint);
         sphericalJoint.springDamping = 1;
         sphericalJoint.springFrequency = 1;
         //  ƒ.Physics.adjustTransforms(environment, true);

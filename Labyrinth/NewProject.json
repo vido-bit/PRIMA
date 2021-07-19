@@ -121,9 +121,7 @@
                     }
                   }
                 }
-              ],
-              "ComponentMesh": [],
-              "ComponentMaterial": []
+              ]
             },
             "children": [
               {
@@ -468,9 +466,9 @@
                                   {
                                     "ƒ.ComponentTransform": {
                                       "local": {
-                                        "translation": "[-0.5999999046325684, 0, 0]",
+                                        "translation": "[-0.619999885559082, 0, 0]",
                                         "rotation": "[0, 0, 0]",
-                                        "scaling": "[0.3999999463558197, 1, 0.6999999284744263]"
+                                        "scaling": "[0.2499999850988388, 1, 0.6999999284744263]"
                                       },
                                       "Component": {
                                         "active": true
