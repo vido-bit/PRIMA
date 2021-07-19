@@ -122,7 +122,7 @@ var Labyrinth;
     }
     function createRigidBodies() {
         environment = root.getChildrenByName("environment")[0];
-        ballBearing = root.getChildrenByName("ballBearing")[0];
+        // ballBearing = root.getChildrenByName("ballBearing")[0];
         let fixplate = root.getChildrenByName("fixplate")[0];
         let floor01 = environment.getChildrenByName("floor01")[0];
         let barriers = floor01.getChildrenByName("barriers")[0];
@@ -141,8 +141,12 @@ var Labyrinth;
         //     ƒ.PHYSICS_GROUP.GROUP_2
         // );
         // fixplate.addComponent(cmpRigidbodyFixplate);
-        cmpRigidBearing = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.DEFAULT);
-        ballBearing.addComponent(cmpRigidBearing);
+        // cmpRigidBearing = new ƒ.ComponentRigidbody(
+        //     1, ƒ.PHYSICS_TYPE.STATIC,
+        //     ƒ.COLLIDER_TYPE.CUBE,
+        //     ƒ.PHYSICS_GROUP.DEFAULT
+        // );
+        // ballBearing.addComponent(cmpRigidBearing);
         let cmpRigidbodyFloor01 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
         floor01.addComponent(cmpRigidbodyFloor01);
         let cmpRigidbodyFloor02 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
@@ -150,14 +154,11 @@ var Labyrinth;
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
             node.addComponent(cmpRigidbodyBarrier);
-            // barrier01.addComponent(cmpRigidbodyBarrier);
-            // barrier02.addComponent(cmpRigidbodyBarrier);
-            // barrier03.addComponent(cmpRigidbodyBarrier);
-            // barrier04.addComponent(cmpRigidbodyBarrier);
         }
         let cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
-        cmpRigidbodyBall.restitution = 0.8;
-        cmpRigidbodyBall.friction = 2.5;
+        cmpRigidbodyBall.restitution = 0.1;
+        cmpRigidbodyBall.friction = 10;
+        cmpRigidbodyBall.mass = 10;
         ball.addComponent(cmpRigidbodyBall);
         // cmpRigidbodyEnv = new ƒ.ComponentRigidbody(
         //   4,

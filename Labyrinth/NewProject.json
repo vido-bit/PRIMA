@@ -479,6 +479,416 @@
                               },
                               "children": []
                             }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ],
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[-0.5, 1.5000001192092896, 0.2500000596046448]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.07000000774860382, 2.0000009536743164, 0.4000000059604645]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[-0.5, 2, -0.3199997544288635]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.4999999701976776, 1.4999996423721313, 0.06000000610947609]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[-0.6000000238418579, 2, -0.10000000149011612]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.30000001192092896, 1.4999998807907104, 0.06000000610947609]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[-0.09999999403953552, 2, -0.30000001192092896]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.07000000029802322, 1.4999998807907104, 0.2999999523162842]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[0.30000004172325134, 2, 0]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.30000001192092896, 1.5000001192092896, 0.05999993160367012]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[-0.2600000202655792, 2, 0.10000000149011612]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.07000000774860382, 1.5000001192092896, 0.49999991059303284]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[0.20000000298023224, 2, 0.1900000125169754]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.24999995529651642, 1.5000001192092896, 0.05999993160367012]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[0.20000000298023224, 2, -0.30000001192092896]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.30000001192092896, 1.5000001192092896, 0.05999993160367012]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[-0.019999999552965164, 2, 0.019999999552965164]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.07000000774860382, 1.5000004768371582, 0.09999995678663254]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          },
+                          {
+                            "ƒ.Node": {
+                              "name": "innerBarrier",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2021-05-30T21:25:07.523Z|30412",
+                                      "pivot": {
+                                        "translation": "[0.02500000037252903, 2, 0.34999996423721313]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[0.20000001788139343, 1.5000001192092896, 0.06000000238418579]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2021-07-19T12:28:20.625Z|78102"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
                           }
                         ]
                       }
@@ -550,7 +960,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[0, 2, 0]",
+                            "translation": "[5, 2, 2]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
@@ -561,6 +971,13 @@
                       }
                     ]
                   },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "New Node",
+                  "components": {},
                   "children": []
                 }
               }
@@ -580,7 +997,7 @@
                       "scaling": "[1, 1, 1]"
                     },
                     "Component": {
-                      "active": true
+                      "active": false
                     }
                   }
                 }
@@ -595,7 +1012,7 @@
                       "scaling": "[1, 1, 1]"
                     },
                     "Component": {
-                      "active": true
+                      "active": false
                     }
                   }
                 }
@@ -612,7 +1029,7 @@
                       "scaling": "[1, 1]"
                     },
                     "Component": {
-                      "active": true
+                      "active": false
                     },
                     "idMaterial": "Material|2021-05-30T21:25:47.296Z|40065"
                   }
@@ -680,6 +1097,19 @@
       ],
       "idResource": "Graph|2021-05-30T21:24:22.133Z|16415",
       "type": "Graph"
+    }
+  },
+  "Material|2021-07-19T12:28:20.625Z|78102": {
+    "ƒ.Material": {
+      "name": "barrierMtr",
+      "idResource": "Material|2021-07-19T12:28:20.625Z|78102",
+      "shader": "ShaderFlat",
+      "coat": {
+        "ƒ.CoatColored": {
+          "name": "Coat",
+          "color": "[0.4196078431372549, 1, 0.9607843137254902, 1]"
+        }
+      }
     }
   }
 }
