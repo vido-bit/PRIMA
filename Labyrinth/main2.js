@@ -98,7 +98,7 @@ var Labyrinth;
         //    handleLevelSetup();
         if (Labyrinth.gameState.level == 1) {
             removeLevel1();
-            createLevel1();
+            // createLevel1();
         }
         if (Labyrinth.gameState.level == 2) {
             createLevel1();
@@ -229,15 +229,26 @@ var Labyrinth;
         }
     }
     function createLevel1() {
-        let level1Mtr = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(40, 240, 240, 0.6)));
-        let innerBarrier01 = createCompleteNode("innerBarrier", level1Mtr, new ƒ.MeshCube());
-        level1.appendChild(innerBarrier01);
-        innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.scale(new ƒ.Vector3(0.07, 3, 0.4));
-        innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.translate(new ƒ.Vector3(-0.5, 0.5, 0.25));
-        let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-        innerBarrier01.addComponent(cmpRigidBarrier);
-        console.log(innerBarrier01);
-        viewport.draw();
+        // let level1Mtr: ƒ.Material = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(40, 240, 240, 0.6)));
+        // let innerBarrier01: ƒ.Node = createCompleteNode("innerBarrier", level1Mtr, new ƒ.MeshCube());
+        // level1.appendChild(innerBarrier01);
+        // innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.scale(new ƒ.Vector3(0.07, 3, 0.4));
+        // // innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.translate(new ƒ.Vector3(-0.5, 0.5, 0.25));
+        // let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+        //     ƒ.PHYSICS_TYPE.KINEMATIC,
+        //     ƒ.COLLIDER_TYPE.CUBE,
+        //     ƒ.PHYSICS_GROUP.GROUP_1
+        // );
+        // innerBarrier01.addComponent(cmpRigidBarrier);
+        // console.log(innerBarrier01);
+        // ƒ.Physics.adjustTransforms(root, true);
+        for (let node of level1.getChildren()) {
+            node.activate(true);
+            let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            if (!node.getComponent(ƒ.ComponentRigidbody))
+                node.addComponent(cmpRigidBarrier);
+            ƒ.Physics.adjustTransforms(root, true);
+        }
     }
     function createLevel2() {
         for (let node of level2.getChildren()) {
@@ -254,9 +265,10 @@ var Labyrinth;
     }
     function removeLevel1() {
         for (let node of level1.getChildren()) {
-            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            if (node.getComponent(ƒ.ComponentRigidbody) != null)
+                node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            node.activate(false);
         }
-        level1.removeAllChildren();
     }
     function removeLevel2() {
         for (let node of level2.getChildren()) {
