@@ -35,7 +35,7 @@ namespace Labyrinth {
     let activeRgdbodyLevel2: boolean;
     let activeLevel3: boolean;
     let activeRgdbodyLevel3: boolean;
-
+    let cmpRgdBodies: ƒ.ComponentRigidbody[]
 
     window.addEventListener("load", init);
 
@@ -111,14 +111,11 @@ namespace Labyrinth {
         //  checkActiveLevelNodes();
         //    handleLevelSetup();
         if (gameState.level == 1) {
-            for (let node of level3.getChildren()) {
-                node.removeComponent(cmpRigidbodyLevel3);
-                node.activate(false);
-            }
-            //       removeLevel1();
+            removeLevel1();
+            createLevel1();
         }
         if (gameState.level == 2) {
-            createLevel3();
+            createLevel1();
         }
         if (environment.mtxLocal.rotation.z > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
@@ -153,23 +150,19 @@ namespace Labyrinth {
 
         cmpCamera.mtxPivot.translate(new ƒ.Vector3(7, 60, 15));
         cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
-
     }
 
     function createGeneralRigidBodies(): void {
         environment = root.getChildrenByName("environment")[0];
-        // ballBearing = root.getChildrenByName("ballBearing")[0];
-        let fixplate: ƒ.Node = root.getChildrenByName("fixplate")[0];
-        let floor01: ƒ.Node = environment.getChildrenByName("floor01")[0];
-        let barriers: ƒ.Node = floor01.getChildrenByName("barriers")[0];
+        let basicFloor: ƒ.Node = environment.getChildrenByName("basicFloor")[0];
+        let barriers: ƒ.Node = basicFloor.getChildrenByName("barriers")[0];
         barrier01 = barriers.getChildrenByName("barrier01")[0];
         barrier02 = barriers.getChildrenByName("barrier02")[0];
         barrier03 = barriers.getChildrenByName("barrier03")[0];
         barrier04 = barriers.getChildrenByName("barrier04")[0];
-        level1 = floor01.getChildrenByName("level1")[0];
-        level2 = floor01.getChildrenByName("level2")[0];
-        level3 = floor01.getChildrenByName("level3")[0];
-        let floor02: ƒ.Node = level1.getChildrenByName("floor02")[0];
+        level1 = basicFloor.getChildrenByName("level1")[0];
+        level2 = basicFloor.getChildrenByName("level2")[0];
+        level3 = basicFloor.getChildrenByName("level3")[0];
         moveables = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
 
@@ -179,7 +172,7 @@ namespace Labyrinth {
             ƒ.COLLIDER_TYPE.CUBE,
             ƒ.PHYSICS_GROUP.GROUP_1
         );
-        floor01.addComponent(cmpRigidbodyFloor01);
+        basicFloor.addComponent(cmpRigidbodyFloor01);
 
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
@@ -290,40 +283,50 @@ namespace Labyrinth {
         }
     }
     function createLevel1(): void {
-        for (let node of level1.getChildren()) {
-            node.addComponent(cmpRigidbodyLevel1);
-            node.activate(true);
-        }
+        let level1Mtr: ƒ.Material = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(40, 240, 240, 0.6)));
+        let innerBarrier01: ƒ.Node = createCompleteNode("innerBarrier", level1Mtr, new ƒ.MeshCube());
+        level1.appendChild(innerBarrier01);
+        innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.scale(new ƒ.Vector3(0.07, 3, 0.4));
+        innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.translate(new ƒ.Vector3(-0.5, 0.5, 0.25));
+        let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+            ƒ.PHYSICS_TYPE.KINEMATIC,
+            ƒ.COLLIDER_TYPE.CUBE,
+            ƒ.PHYSICS_GROUP.GROUP_1
+        );
+        innerBarrier01.addComponent(cmpRigidBarrier);
+        console.log(innerBarrier01);
+        viewport.draw();
     }
     function createLevel2(): void {
         for (let node of level2.getChildren()) {
-            node.addComponent(cmpRigidbodyLevel2);
+            node.addComponent(node.getComponent(ƒ.ComponentRigidbody));
             node.activate(true);
         }
     }
     function createLevel3(): void {
         for (let node of level3.getChildren()) {
-            node.addComponent(cmpRigidbodyLevel3);
+            node.addComponent(node.getComponent(ƒ.ComponentRigidbody));
             node.activate(true);
         }
+        level1.removeAllChildren();
     }
     function removeLevel1(): void {
         for (let node of level1.getChildren()) {
-            node.removeComponent(cmpRigidbodyLevel1);
-            node.activate(false);
+            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
         }
+        level1.removeAllChildren();
     }
     function removeLevel2(): void {
         for (let node of level2.getChildren()) {
-            node.removeComponent(cmpRigidbodyLevel2);
-            node.activate(false);
+            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
         }
+        level2.removeAllChildren();
     }
     function removeLevel3(): void {
         for (let node of level3.getChildren()) {
-            node.removeComponent(cmpRigidbodyLevel3);
-            node.activate(false);
+            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
         }
+        level3.removeAllChildren();
     }
     let stepWidth: number = 0.1;
     function hndKey(_event: KeyboardEvent): void {
@@ -355,5 +358,19 @@ namespace Labyrinth {
         if (_event.code == ƒ.KEYBOARD_CODE.G) {
             sphericalJoint.connectedRigidbody.applyTorque(new ƒ.Vector3(0, 1 * 100, 0));
         }
+    }
+    function createCompleteNode(_name: string, _material: ƒ.Material, _mesh: ƒ.Mesh): ƒ.Node {
+        let node: ƒ.Node = new ƒ.Node(_name);
+        let cmpMesh: ƒ.ComponentMesh = new ƒ.ComponentMesh(_mesh);
+        let cmpMaterial: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(_material);
+        let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform();
+        // let cmpRigidbody: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(_mass, _physicsType, _colType, _group);
+        // cmpRigidbody.restitution = 0.2;
+        // cmpRigidbody.friction = 0.8;
+        node.addComponent(cmpMesh);
+        node.addComponent(cmpMaterial);
+        node.addComponent(cmpTransform);
+        // node.addComponent(cmpRigidbody);
+        return node;
     }
 }

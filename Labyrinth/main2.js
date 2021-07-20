@@ -31,6 +31,7 @@ var Labyrinth;
     let activeRgdbodyLevel2;
     let activeLevel3;
     let activeRgdbodyLevel3;
+    let cmpRgdBodies;
     window.addEventListener("load", init);
     function init(_event) {
         let dialog = document.querySelector("dialog");
@@ -96,14 +97,11 @@ var Labyrinth;
         //  checkActiveLevelNodes();
         //    handleLevelSetup();
         if (Labyrinth.gameState.level == 1) {
-            for (let node of level3.getChildren()) {
-                node.removeComponent(cmpRigidbodyLevel3);
-                node.activate(false);
-            }
-            //       removeLevel1();
+            removeLevel1();
+            createLevel1();
         }
         if (Labyrinth.gameState.level == 2) {
-            createLevel3();
+            createLevel1();
         }
         if (environment.mtxLocal.rotation.z > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
@@ -137,22 +135,19 @@ var Labyrinth;
     }
     function createGeneralRigidBodies() {
         environment = root.getChildrenByName("environment")[0];
-        // ballBearing = root.getChildrenByName("ballBearing")[0];
-        let fixplate = root.getChildrenByName("fixplate")[0];
-        let floor01 = environment.getChildrenByName("floor01")[0];
-        let barriers = floor01.getChildrenByName("barriers")[0];
+        let basicFloor = environment.getChildrenByName("basicFloor")[0];
+        let barriers = basicFloor.getChildrenByName("barriers")[0];
         barrier01 = barriers.getChildrenByName("barrier01")[0];
         barrier02 = barriers.getChildrenByName("barrier02")[0];
         barrier03 = barriers.getChildrenByName("barrier03")[0];
         barrier04 = barriers.getChildrenByName("barrier04")[0];
-        level1 = floor01.getChildrenByName("level1")[0];
-        level2 = floor01.getChildrenByName("level2")[0];
-        level3 = floor01.getChildrenByName("level3")[0];
-        let floor02 = level1.getChildrenByName("floor02")[0];
+        level1 = basicFloor.getChildrenByName("level1")[0];
+        level2 = basicFloor.getChildrenByName("level2")[0];
+        level3 = basicFloor.getChildrenByName("level3")[0];
         moveables = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
         let cmpRigidbodyFloor01 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-        floor01.addComponent(cmpRigidbodyFloor01);
+        basicFloor.addComponent(cmpRigidbodyFloor01);
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
             node.addComponent(cmpRigidbodyBarrier);
@@ -234,40 +229,46 @@ var Labyrinth;
         }
     }
     function createLevel1() {
-        for (let node of level1.getChildren()) {
-            node.addComponent(cmpRigidbodyLevel1);
-            node.activate(true);
-        }
+        let level1Mtr = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(40, 240, 240, 0.6)));
+        let innerBarrier01 = createCompleteNode("innerBarrier", level1Mtr, new ƒ.MeshCube());
+        level1.appendChild(innerBarrier01);
+        innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.scale(new ƒ.Vector3(0.07, 3, 0.4));
+        innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.translate(new ƒ.Vector3(-0.5, 0.5, 0.25));
+        let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+        innerBarrier01.addComponent(cmpRigidBarrier);
+        console.log(innerBarrier01);
+        viewport.draw();
     }
     function createLevel2() {
         for (let node of level2.getChildren()) {
-            node.addComponent(cmpRigidbodyLevel2);
+            node.addComponent(node.getComponent(ƒ.ComponentRigidbody));
             node.activate(true);
         }
     }
     function createLevel3() {
         for (let node of level3.getChildren()) {
-            node.addComponent(cmpRigidbodyLevel3);
+            node.addComponent(node.getComponent(ƒ.ComponentRigidbody));
             node.activate(true);
         }
+        level1.removeAllChildren();
     }
     function removeLevel1() {
         for (let node of level1.getChildren()) {
-            node.removeComponent(cmpRigidbodyLevel1);
-            node.activate(false);
+            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
         }
+        level1.removeAllChildren();
     }
     function removeLevel2() {
         for (let node of level2.getChildren()) {
-            node.removeComponent(cmpRigidbodyLevel2);
-            node.activate(false);
+            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
         }
+        level2.removeAllChildren();
     }
     function removeLevel3() {
         for (let node of level3.getChildren()) {
-            node.removeComponent(cmpRigidbodyLevel3);
-            node.activate(false);
+            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
         }
+        level3.removeAllChildren();
     }
     let stepWidth = 0.1;
     function hndKey(_event) {
@@ -298,6 +299,20 @@ var Labyrinth;
         if (_event.code == ƒ.KEYBOARD_CODE.G) {
             sphericalJoint.connectedRigidbody.applyTorque(new ƒ.Vector3(0, 1 * 100, 0));
         }
+    }
+    function createCompleteNode(_name, _material, _mesh) {
+        let node = new ƒ.Node(_name);
+        let cmpMesh = new ƒ.ComponentMesh(_mesh);
+        let cmpMaterial = new ƒ.ComponentMaterial(_material);
+        let cmpTransform = new ƒ.ComponentTransform();
+        // let cmpRigidbody: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(_mass, _physicsType, _colType, _group);
+        // cmpRigidbody.restitution = 0.2;
+        // cmpRigidbody.friction = 0.8;
+        node.addComponent(cmpMesh);
+        node.addComponent(cmpMaterial);
+        node.addComponent(cmpTransform);
+        // node.addComponent(cmpRigidbody);
+        return node;
     }
 })(Labyrinth || (Labyrinth = {}));
 //# sourceMappingURL=main2.js.map
