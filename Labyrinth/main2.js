@@ -4,6 +4,8 @@ var Labyrinth;
     let root;
     let environment; // = new NeigePlattorm;
     let level1;
+    let level2;
+    let level3;
     let moveables;
     let ball;
     let cmpRigidbodyBall;
@@ -20,6 +22,15 @@ var Labyrinth;
     let barrier02;
     let barrier03;
     let barrier04;
+    let cmpRigidbodyLevel1;
+    let cmpRigidbodyLevel2;
+    let cmpRigidbodyLevel3;
+    let activeLevel1;
+    let activeRgdbodyLevel1;
+    let activeLevel2;
+    let activeRgdbodyLevel2;
+    let activeLevel3;
+    let activeRgdbodyLevel3;
     window.addEventListener("load", init);
     function init(_event) {
         let dialog = document.querySelector("dialog");
@@ -31,8 +42,8 @@ var Labyrinth;
         ƒ.Physics.settings.debugDraw = true;
         ƒ.Physics.initializePhysics();
         ƒ.Physics.world.setSolverIterations(1000);
-        ƒ.Physics.settings.defaultRestitution = 0.3;
-        ƒ.Physics.settings.defaultFriction = 0.8;
+        ƒ.Physics.settings.defaultRestitution = 0.1;
+        ƒ.Physics.settings.defaultFriction = 0.1;
         ƒ.Debug.log("Project:", ƒ.Project.resources);
     }
     async function startInteractiveViewport() {
@@ -49,14 +60,14 @@ var Labyrinth;
         moveables = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
         ballBearing = root.getChildrenByName("ballbearing")[0];
-        createRigidBodies();
+        createGeneralRigidBodies();
         // settingUpJoint();
         ƒ.Physics.adjustTransforms(root, true);
         // hide the cursor when interacting, also suppressing right-click menu
-        canvas.addEventListener("mousedown", canvas.requestPointerLock);
-        canvas.addEventListener("mouseup", function () {
-            document.exitPointerLock();
-        });
+        // canvas.addEventListener("mousedown", canvas.requestPointerLock);
+        // canvas.addEventListener("mouseup", function (): void {
+        //     document.exitPointerLock();
+        // });
         // make the camera interactive (complex method in FudgeAid)
         FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
         // setup audio
@@ -68,10 +79,12 @@ var Labyrinth;
         ƒ.Debug.log("Audio:", ƒ.AudioManager.default);
         // draw viewport once for immediate feedback
         viewport.draw();
-        canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", {
-            bubbles: true,
-            detail: viewport
-        }));
+        // canvas.dispatchEvent(
+        //     new CustomEvent("interactiveViewportStarted", {
+        //         bubbles: true,
+        //         detail: viewport
+        //     })
+        // );
         // environment.addComponent(new ƒ.ComponentTransform);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         Labyrinth.Gui.start();
@@ -80,47 +93,49 @@ var Labyrinth;
     function update(_event) {
         ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
         ƒ.Physics.settings.debugDraw = true;
-        // hndKey(this);
-        // let neigbarX: boolean = false;
-        // if (environment.mtxWorld.rotation.x < 15 && environment.mtxWorld.rotation.x > -15)
-        //   neigbarX = true;
-        // let neigbarZ: boolean = false;
-        // if (environment.mtxWorld.rotation.z < 15 && environment.mtxWorld.rotation.z > -15)
-        //   neigbarZ = true;
-        if (environment.mtxLocal.rotation.x > -12) {
+        //  checkActiveLevelNodes();
+        //    handleLevelSetup();
+        if (Labyrinth.gameState.level == 1) {
+            for (let node of level3.getChildren()) {
+                node.removeComponent(cmpRigidbodyLevel3);
+                node.activate(false);
+            }
+            //       removeLevel1();
+        }
+        if (Labyrinth.gameState.level == 2) {
+            createLevel3();
+        }
+        if (environment.mtxLocal.rotation.z > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
-                environment.mtxLocal.rotateX((-45 / ƒ.Loop.timeFrameGame) / 10);
-                Labyrinth.gameState.level--;
-                console.log(environment.mtxLocal.getX());
-            }
-        }
-        if (environment.mtxLocal.rotation.x < 12) {
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D])) {
-                environment.mtxLocal.rotateX((45 / ƒ.Loop.timeFrameGame) / 10);
-            }
-        }
-        if (environment.mtxLocal.rotation.z > -12) {
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W])) {
                 environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
+            }
+        }
+        if (environment.mtxLocal.rotation.z < 15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D])) {
+                environment.mtxLocal.rotateZ((45 / ƒ.Loop.timeFrameGame) / 10);
+            }
+        }
+        if (environment.mtxLocal.rotation.x > -15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S])) {
+                environment.mtxLocal.rotateX((-45 / ƒ.Loop.timeFrameGame) / 10);
                 //cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((-45 / ƒ.Loop.timeFrameGame) / 10));
                 // cmpRigidbodyBall.applyForce(ƒ.Vector3.Y(50));
-                Labyrinth.gameState.level++;
             }
         }
-        if (environment.mtxLocal.rotation.z < 12) {
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S])) {
+        if (environment.mtxLocal.rotation.x < 15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W])) {
                 //   cmpRigidbodyEnv.mtxPivot.rotateZ((45 / ƒ.Loop.timeFrameGame) / 10);
-                environment.mtxLocal.rotateZ((45 / ƒ.Loop.timeFrameGame) / 10);
+                environment.mtxLocal.rotateX((45 / ƒ.Loop.timeFrameGame) / 10);
                 console.log(barrier01.mtxLocal.getY().y.toString());
             }
         }
         viewport.draw();
     }
     function setUpCam() {
-        cmpCamera.mtxPivot.translate(new ƒ.Vector3(15, 40, -10));
+        cmpCamera.mtxPivot.translate(new ƒ.Vector3(7, 60, 15));
         cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
     }
-    function createRigidBodies() {
+    function createGeneralRigidBodies() {
         environment = root.getChildrenByName("environment")[0];
         // ballBearing = root.getChildrenByName("ballBearing")[0];
         let fixplate = root.getChildrenByName("fixplate")[0];
@@ -131,26 +146,13 @@ var Labyrinth;
         barrier03 = barriers.getChildrenByName("barrier03")[0];
         barrier04 = barriers.getChildrenByName("barrier04")[0];
         level1 = floor01.getChildrenByName("level1")[0];
+        level2 = floor01.getChildrenByName("level2")[0];
+        level3 = floor01.getChildrenByName("level3")[0];
         let floor02 = level1.getChildrenByName("floor02")[0];
         moveables = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
-        // let cmpRigidbodyFixplate: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-        //     2,
-        //     ƒ.PHYSICS_TYPE.STATIC,
-        //     ƒ.COLLIDER_TYPE.CUBE,
-        //     ƒ.PHYSICS_GROUP.GROUP_2
-        // );
-        // fixplate.addComponent(cmpRigidbodyFixplate);
-        // cmpRigidBearing = new ƒ.ComponentRigidbody(
-        //     1, ƒ.PHYSICS_TYPE.STATIC,
-        //     ƒ.COLLIDER_TYPE.CUBE,
-        //     ƒ.PHYSICS_GROUP.DEFAULT
-        // );
-        // ballBearing.addComponent(cmpRigidBearing);
         let cmpRigidbodyFloor01 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
         floor01.addComponent(cmpRigidbodyFloor01);
-        let cmpRigidbodyFloor02 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-        floor02.addComponent(cmpRigidbodyFloor02);
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
             node.addComponent(cmpRigidbodyBarrier);
@@ -160,70 +162,112 @@ var Labyrinth;
         cmpRigidbodyBall.friction = 10;
         cmpRigidbodyBall.mass = 10;
         ball.addComponent(cmpRigidbodyBall);
-        // cmpRigidbodyEnv = new ƒ.ComponentRigidbody(
-        //   4,
-        //   ƒ.PHYSICS_TYPE.DYNAMIC,
-        //   ƒ.COLLIDER_TYPE.CUBE,
-        //   ƒ.PHYSICS_GROUP.GROUP_1
-        // );
-        // environment.addComponent(cmpRigidbodyEnv);
+        for (let node of level1.getChildren()) {
+            cmpRigidbodyLevel1 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            node.addComponent(cmpRigidbodyLevel1);
+        }
+        for (let node of level2.getChildren()) {
+            cmpRigidbodyLevel2 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            node.addComponent(cmpRigidbodyLevel2);
+        }
+        for (let node of level3.getChildren()) {
+            cmpRigidbodyLevel3 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            node.addComponent(cmpRigidbodyLevel3);
+        }
     }
-    // cmpRigidBearing = new ƒ.ComponentRigidbody(
-    //     1, ƒ.PHYSICS_TYPE.STATIC,
-    //     ƒ.COLLIDER_TYPE.SPHERE,
-    //     ƒ.PHYSICS_GROUP.DEFAULT
-    // );
-    // ballBearing.addComponent(cmpRigidBearing);
-    // let cmpRigidbodyFloor11: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-    //     2,
-    //     ƒ.PHYSICS_TYPE.STATIC,
-    //     ƒ.COLLIDER_TYPE.CUBE,
-    //     ƒ.PHYSICS_GROUP.DEFAULT
-    // );
-    // let cmpRigidbodyFloor12: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-    //     2,
-    //     ƒ.PHYSICS_TYPE.STATIC,
-    //     ƒ.COLLIDER_TYPE.CUBE,
-    //     ƒ.PHYSICS_GROUP.DEFAULT
-    // );
-    // environment = root.getChild(0);
-    // environment.addComponent(cmpRigidbodyEnv);
-    // //environmentTransform = environment.getComponent(ƒ.ComponentTransform);
-    // window.addEventListener("load", init);
-    // level1 = environment.getChildrenByName("level1")[0];
-    // floor1 = level1.getChildrenByName("floor1")[0];
-    // let floor11: ƒ.Node = floor1.getChildrenByName("floor11")[0];
-    // floor11.addComponent(cmpRigidbodyFloor11);
-    // let floor12: ƒ.Node = floor1.getChildrenByName("floor12")[0];
-    // floor12.addComponent(cmpRigidbodyFloor12);
-    // let barriers: ƒ.Node = environment.getChildrenByName("barriers")[0];
-    // for (let node of barriers.getChildren()) {
-    //     let cmpRigidbodyBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-    //         2,
-    //         ƒ.PHYSICS_TYPE.STATIC,
-    //         ƒ.COLLIDER_TYPE.CUBE,
-    //         ƒ.PHYSICS_GROUP.GROUP_2
-    //     );
-    //     node.addComponent(cmpRigidbodyBarrier);
-    //     //  console.log(node.name, node.cmpTransform?.mtxLocal.toString());
-    // }
-    // for (let node of moveables.getChildren()) {
-    //     cmpRigidbodyBall = new ƒ.ComponentRigidbody(
-    //         1,
-    //         ƒ.PHYSICS_TYPE.STATIC,
-    //         ƒ.COLLIDER_TYPE.SPHERE,
-    //         ƒ.PHYSICS_GROUP.GROUP_2
-    //     );
-    //     cmpRigidbodyBall.restitution = 0.8;
-    //     cmpRigidbodyBall.friction = 2.5;
-    //     node.addComponent(cmpRigidbodyBall);
-    // }
-    function settingUpJoint() {
-        sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyEnv);
-        // environmentTransform.getContainer().addComponent(sphericalJoint);
-        environment.addComponent(sphericalJoint);
-        sphericalJoint.springDamping = 0.1;
-        sphericalJoint.springFrequency = 1;
+    function checkActiveLevelNodes() {
+        for (let node of level1.getChildren()) {
+            if (node.isActive)
+                activeLevel1 = true;
+            else
+                activeLevel1 = false;
+        }
+        if (cmpRigidbodyLevel1.isActive)
+            activeRgdbodyLevel1 = true;
+        else
+            activeRgdbodyLevel2 = false;
+        for (let node of level2.getChildren()) {
+            if (node.isActive)
+                activeLevel2 = true;
+            else
+                activeLevel2 = false;
+        }
+        if (cmpRigidbodyLevel2.isActive)
+            activeRgdbodyLevel2 = true;
+        else
+            activeRgdbodyLevel2 = false;
+        for (let node of level3.getChildren()) {
+            if (node.isActive)
+                activeLevel3 = true;
+            else
+                activeLevel3 = false;
+        }
+        if (cmpRigidbodyLevel3.isActive)
+            activeRgdbodyLevel3 = true;
+        else
+            activeRgdbodyLevel3 = false;
+    }
+    function handleLevelSetup() {
+        if (Labyrinth.gameState.level == 1) {
+            if (activeLevel2)
+                removeLevel2();
+            if (activeLevel3)
+                removeLevel3();
+            if (!activeLevel1)
+                createLevel1();
+        }
+        if (Labyrinth.gameState.level == 2) {
+            if (activeLevel1)
+                removeLevel1();
+            if (activeLevel3)
+                removeLevel3();
+            if (!activeLevel2)
+                createLevel2();
+        }
+        if (Labyrinth.gameState.level == 3) {
+            if (activeLevel1)
+                removeLevel1();
+            if (activeLevel2)
+                removeLevel2();
+            if (!activeLevel3)
+                createLevel3();
+        }
+    }
+    function createLevel1() {
+        for (let node of level1.getChildren()) {
+            node.addComponent(cmpRigidbodyLevel1);
+            node.activate(true);
+        }
+    }
+    function createLevel2() {
+        for (let node of level2.getChildren()) {
+            node.addComponent(cmpRigidbodyLevel2);
+            node.activate(true);
+        }
+    }
+    function createLevel3() {
+        for (let node of level3.getChildren()) {
+            node.addComponent(cmpRigidbodyLevel3);
+            node.activate(true);
+        }
+    }
+    function removeLevel1() {
+        for (let node of level1.getChildren()) {
+            node.removeComponent(cmpRigidbodyLevel1);
+            node.activate(false);
+        }
+    }
+    function removeLevel2() {
+        for (let node of level2.getChildren()) {
+            node.removeComponent(cmpRigidbodyLevel2);
+            node.activate(false);
+        }
+    }
+    function removeLevel3() {
+        for (let node of level3.getChildren()) {
+            node.removeComponent(cmpRigidbodyLevel3);
+            node.activate(false);
+        }
     }
     let stepWidth = 0.1;
     function hndKey(_event) {
