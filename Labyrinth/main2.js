@@ -94,29 +94,8 @@ var Labyrinth;
     function update(_event) {
         ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
         ƒ.Physics.settings.debugDraw = true;
-        //  checkActiveLevelNodes();
-        //    handleLevelSetup();
-        if (Labyrinth.gameState.level == 1) {
-            createLevel1();
-            if (activeLevel2)
-                removeLevel2();
-            if (activeLevel3)
-                removeLevel3();
-        }
-        if (Labyrinth.gameState.level == 2) {
-            createLevel2();
-            if (activeLevel1)
-                removeLevel1();
-            if (activeLevel3)
-                removeLevel3();
-        }
-        if (Labyrinth.gameState.level == 3) {
-            createLevel3();
-            if (activeLevel1)
-                removeLevel1();
-            if (activeLevel2)
-                removeLevel2();
-        }
+        checkActiveLevelNodes();
+        handleLevelSetup();
         if (environment.mtxLocal.rotation.z > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
                 environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
@@ -207,28 +186,25 @@ var Labyrinth;
     }
     function handleLevelSetup() {
         if (Labyrinth.gameState.level == 1) {
+            createLevel1();
             if (activeLevel2)
                 removeLevel2();
             if (activeLevel3)
                 removeLevel3();
-            if (!activeLevel1)
-                createLevel1();
         }
         if (Labyrinth.gameState.level == 2) {
+            createLevel2();
             if (activeLevel1)
                 removeLevel1();
             if (activeLevel3)
                 removeLevel3();
-            if (!activeLevel2)
-                createLevel2();
         }
         if (Labyrinth.gameState.level == 3) {
+            createLevel3();
             if (activeLevel1)
                 removeLevel1();
             if (activeLevel2)
                 removeLevel2();
-            if (!activeLevel3)
-                createLevel3();
         }
     }
     function createLevel1() {
