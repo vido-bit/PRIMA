@@ -16,8 +16,8 @@
 <link type="resources" src="NewProject.json" />
 <!--My Code-->
 <script type="text/javascript" src="Gui.js"></script>
-<!-- <script type="text/javascript" src="NeigePlattform.js"></script> -->
-<script type="text/javascript" src="main2.js"></script>
+<script type="text/javascript" src="Ball.js"></script>
+  <script type="text/javascript" src="main2.js"></script>
 </head>
 <body>
 <!--Dialog shown at startup only-->
@@ -29,8 +29,15 @@
 <canvas class="fullscreen">
 </canvas>
 <div id="user-interface">
-  <h4 id="ui-headline"></h4>
+  <label id="ui-headline"></label>
     <input type=number key="level" value="1" min="1" max="3"/>
+  </div>
+  <div id="success-message">
+    <h2 id="sm-heading"></h2>
+    <h3 id="sm-subheading"></h3>
+    <a href="#" id="lvl1-button"></a>
+    <a href="#" id="lvl2-button"></a>
+    <a href="#" id="lvl3-button"></a>
   </div>
 </body>
 </html>

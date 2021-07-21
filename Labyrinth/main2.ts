@@ -6,37 +6,22 @@ namespace Labyrinth {
     let level2: ƒ.Node;
     let level3: ƒ.Node;
     let moveables: ƒ.Node;
-    let ball: ƒ.Node;
-    let cmpRigidbodyBall: ƒ.ComponentRigidbody;
-    let floor1: ƒ.Node;
-    let camPosition: ƒ.Vector3 = new ƒ.Vector3(1, 10, 2);
-    let cmpRigidbodyEnv: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-        0,
-        ƒ.PHYSICS_TYPE.DYNAMIC,
-        ƒ.COLLIDER_TYPE.CUBE,
-        ƒ.PHYSICS_GROUP.GROUP_2
-    );
+    let ball: Ball;
     let cmpCamera: ƒ.ComponentCamera = new ƒ.ComponentCamera();
     let viewport: ƒ.Viewport = new ƒ.Viewport();
-    let ballBearing: ƒ.Node;
-    let cmpRigidBearing: ƒ.ComponentRigidbody;
     let sphericalJoint: ƒ.ComponentJointSpherical;
     let environmentTransform: ƒ.ComponentTransform;
     let barrier01: ƒ.Node;
     let barrier02: ƒ.Node;
     let barrier03: ƒ.Node;
     let barrier04: ƒ.Node;
-    let cmpRigidbodyLevel1: ƒ.ComponentRigidbody;
-    let cmpRigidbodyLevel2: ƒ.ComponentRigidbody;
-    let cmpRigidbodyLevel3: ƒ.ComponentRigidbody;
     let activeLevel1: boolean;
-    let activeRgdbodyLevel1: boolean;
     let activeLevel2: boolean;
-    let activeRgdbodyLevel2: boolean;
     let activeLevel3: boolean;
-    let activeRgdbodyLevel3: boolean;
-    let cmpRgdBodies: ƒ.ComponentRigidbody[]
-
+    let collisionSound: ƒ.Audio = new ƒ.Audio("jump.mp3");
+    let lvl1CompleteSound: ƒ.Audio = new ƒ.Audio("person_cheering.mp3");
+    let lvl2CompleteSound: ƒ.Audio = new ƒ.Audio("crowd_cheering.mp3");
+    let lvl3CompleteSound: ƒ.Audio = new ƒ.Audio("sports-crowd_cheering.mp3");
     window.addEventListener("load", init);
 
     function init(_event: Event): void {
@@ -67,9 +52,6 @@ namespace Labyrinth {
         let canvas: HTMLCanvasElement = document.querySelector("canvas");
         viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
         ƒ.Debug.log("Viewport:", viewport);
-        moveables = root.getChildrenByName("moveables")[0];
-        ball = moveables.getChildrenByName("ball")[0];
-        ballBearing = root.getChildrenByName("ballbearing")[0];
         createGeneralRigidBodies();
         // settingUpJoint();
         ƒ.Physics.adjustTransforms(root, true);
@@ -100,7 +82,11 @@ namespace Labyrinth {
         Gui.start();
         ƒ.Loop.start();
     }
-
+    function createBall(): void {
+        ball = new Ball();
+        ball.mtxLocal.translateY(10);
+        moveables.appendChild(ball);
+    }
     function update(_event: Event): void {
 
 
@@ -124,9 +110,6 @@ namespace Labyrinth {
         if (environment.mtxLocal.rotation.x > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S])) {
                 environment.mtxLocal.rotateX((-45 / ƒ.Loop.timeFrameGame) / 10);
-                //cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((-45 / ƒ.Loop.timeFrameGame) / 10));
-                // cmpRigidbodyBall.applyForce(ƒ.Vector3.Y(50));
-
             }
         }
         if (environment.mtxLocal.rotation.x < 15) {
@@ -136,15 +119,13 @@ namespace Labyrinth {
                 console.log(barrier01.mtxLocal.getY().y.toString());
             }
         }
-        //   ƒ.Physics.adjustTransforms(root, true);
+        checkBallPosition();
         viewport.draw();
         ƒ.Physics.adjustTransforms(root, true);
     }
 
-
     function setUpCam(): void {
-
-        cmpCamera.mtxPivot.translate(new ƒ.Vector3(7, 60, 15));
+        cmpCamera.mtxPivot.translate(new ƒ.Vector3(-5, 60, 15));
         cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
     }
 
@@ -160,7 +141,8 @@ namespace Labyrinth {
         level2 = basicFloor.getChildrenByName("level2")[0];
         level3 = basicFloor.getChildrenByName("level3")[0];
         moveables = root.getChildrenByName("moveables")[0];
-        ball = moveables.getChildrenByName("ball")[0];
+        ball = new Ball();
+        moveables.appendChild(ball);
 
         let cmpRigidbodyBasicFloor: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
             2,
@@ -178,18 +160,46 @@ namespace Labyrinth {
                 ƒ.COLLIDER_TYPE.CUBE,
                 ƒ.PHYSICS_GROUP.GROUP_1
             );
+            cmpRigidbodyBarrier.restitution = 1;
             node.addComponent(cmpRigidbodyBarrier);
         }
-        let cmpRigidbodyBall: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-            1,
-            ƒ.PHYSICS_TYPE.DYNAMIC,
-            ƒ.COLLIDER_TYPE.SPHERE,
-            ƒ.PHYSICS_GROUP.GROUP_2
-        );
-        cmpRigidbodyBall.restitution = 0.1;
-        cmpRigidbodyBall.friction = 10;
-        cmpRigidbodyBall.mass = 10;
-        ball.addComponent(cmpRigidbodyBall);
+        // let cmpRigidbodyBall: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
+        //     1,
+        //     ƒ.PHYSICS_TYPE.DYNAMIC,
+        //     ƒ.COLLIDER_TYPE.SPHERE,
+        //     ƒ.PHYSICS_GROUP.GROUP_2
+        // );
+        // cmpRigidbodyBall.restitution = 0.1;
+        // cmpRigidbodyBall.friction = 10;
+        // cmpRigidbodyBall.mass = 10;
+        // ball.addComponent(cmpRigidbodyBall);
+    }
+    function handleCollisionEventEnter(_event: ƒ.EventPhysics): void {
+        let level1Mtr: ƒ.Material = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(240, 20, 20)));
+        let hit1Mtr: ƒ.Material = new ƒ.Material("Hit1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 245, 60)));
+        let hit2Mtr: ƒ.Material = new ƒ.Material("Hit2", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 145, 60)));
+        let hit3Mtr: ƒ.Material = new ƒ.Material("Hit3", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 60, 60)));
+        if (_event.cmpRigidbody.getContainer().name == "ball") {
+            if (this.restitution == 2) {
+                this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
+                this.restitution += 2;
+            }
+            // if (this.restitution == 5) {
+            //     this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
+            //     ƒ.Debug.log("3. Hit");
+            //     this.restitution += 2;
+            // }
+            if (this.restitution == 1) {
+                this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit1Mtr;
+                ƒ.Debug.log("1. Hit");
+                this.restitution++;
+            }
+        }
+    }
+    function handleCollisionEventExit(_event: ƒ.EventPhysics): void {
+        if (_event.cmpRigidbody.getContainer().name == "Ball") {
+            ƒ.Debug.log("Ball left me - Collider");
+        }
     }
     function checkActiveLevelNodes(): void {
         for (let node of level1.getChildren()) {
@@ -212,6 +222,8 @@ namespace Labyrinth {
         }
     }
     function handleLevelSetup(): void {
+        if (gameState.level == 0)
+            gameState.level = 1;
         if (gameState.level == 1) {
             createLevel1();
             if (activeLevel2)
@@ -233,21 +245,9 @@ namespace Labyrinth {
             if (activeLevel2)
                 removeLevel2();
         }
+
     }
     function createLevel1(): void {
-        // let level1Mtr: ƒ.Material = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(40, 240, 240, 0.6)));
-        // let innerBarrier01: ƒ.Node = createCompleteNode("innerBarrier", level1Mtr, new ƒ.MeshCube());
-        // level1.appendChild(innerBarrier01);
-        // innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.scale(new ƒ.Vector3(0.07, 3, 0.4));
-        // // innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.translate(new ƒ.Vector3(-0.5, 0.5, 0.25));
-        // let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
-        //     ƒ.PHYSICS_TYPE.KINEMATIC,
-        //     ƒ.COLLIDER_TYPE.CUBE,
-        //     ƒ.PHYSICS_GROUP.GROUP_1
-        // );
-        // innerBarrier01.addComponent(cmpRigidBarrier);
-        // console.log(innerBarrier01);
-        // ƒ.Physics.adjustTransforms(root, true);
         for (let node of level1.getChildren()) {
             node.activate(true);
             let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
@@ -255,7 +255,9 @@ namespace Labyrinth {
                 ƒ.COLLIDER_TYPE.CUBE,
                 ƒ.PHYSICS_GROUP.GROUP_1
             );
-            cmpRigidBarrier.restitution = 10;
+            cmpRigidBarrier.restitution = 1;
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
             if (!node.getComponent(ƒ.ComponentRigidbody))
                 node.addComponent(cmpRigidBarrier);
         }
@@ -336,18 +338,46 @@ namespace Labyrinth {
             sphericalJoint.connectedRigidbody.applyTorque(new ƒ.Vector3(0, 1 * 100, 0));
         }
     }
-    function createCompleteNode(_name: string, _material: ƒ.Material, _mesh: ƒ.Mesh): ƒ.Node {
-        let node: ƒ.Node = new ƒ.Node(_name);
-        let cmpMesh: ƒ.ComponentMesh = new ƒ.ComponentMesh(_mesh);
-        let cmpMaterial: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(_material);
-        let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform();
-        // let cmpRigidbody: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(_mass, _physicsType, _colType, _group);
-        // cmpRigidbody.restitution = 0.2;
-        // cmpRigidbody.friction = 0.8;
-        node.addComponent(cmpMesh);
-        node.addComponent(cmpMaterial);
-        node.addComponent(cmpTransform);
-        // node.addComponent(cmpRigidbody);
-        return node;
+    function checkBallPosition(): void {
+        if (ball.mtxLocal.translation.y < -10)
+            showSuccessMessage();
+    }
+    function showSuccessMessage(): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "block";
+        // successDiv.setAttribute("display", "block");
+        let successHeading: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("sm-heading");
+        let subHeading: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("sm-subheading");
+        let lvl1Button: HTMLAnchorElement = <HTMLAnchorElement>document.getElementById("lvl1-button");
+        let lvl2Button: HTMLAnchorElement = <HTMLAnchorElement>document.getElementById("lvl2-button");
+        let lvl3Button: HTMLAnchorElement = <HTMLAnchorElement>document.getElementById("lvl3-button");
+        successHeading.innerText = "Congratulations!";
+        subHeading.innerText = "Play again?";
+        lvl1Button.innerText = "Level 1";
+        lvl2Button.innerText = "Level 2";
+        lvl3Button.innerText = "Level 3";
+        lvl1Button.addEventListener("click", handleLevel1Click);
+        lvl2Button.addEventListener("click", handleLevel2Click);
+        lvl3Button.addEventListener("click", handleLevel3Click);
+        moveables.removeAllChildren();
+        viewport.draw();
+    }
+    function handleLevel1Click(_click: Event): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "none";
+        gameState.level = 1;
+        createBall();
+    }
+    function handleLevel2Click(_click: Event): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "none";
+        gameState.level = 2;
+        createBall();
+    }
+    function handleLevel3Click(_click: Event): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "none";
+        gameState.level = 3;
+        createBall();
     }
 }

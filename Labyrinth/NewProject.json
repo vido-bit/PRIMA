@@ -8,7 +8,7 @@
   },
   "Material|2021-05-30T21:25:47.296Z|40065": {
     "ƒ.Material": {
-      "name": "NewMaterial",
+      "name": "ballMtr",
       "idResource": "Material|2021-05-30T21:25:47.296Z|40065",
       "shader": "ShaderFlat",
       "coat": {
@@ -178,7 +178,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[0, 1, 0]",
+                            "translation": "[0, -1, 0]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[15, 1, 20]"
                           },
@@ -251,9 +251,9 @@
                                   {
                                     "ƒ.ComponentTransform": {
                                       "local": {
-                                        "translation": "[-0.7999999523162842, 1, 0]",
+                                        "translation": "[-0.7799999713897705, 1, 0]",
                                         "rotation": "[0, 0, 0]",
-                                        "scaling": "[0.10000000149011612, 1, 1.100000023841858]"
+                                        "scaling": "[0.07000000774860382, 3, 1.0699999332427979]"
                                       },
                                       "Component": {
                                         "active": true
@@ -306,9 +306,9 @@
                                   {
                                     "ƒ.ComponentTransform": {
                                       "local": {
-                                        "translation": "[0.5, 1, 0]",
+                                        "translation": "[0.5199999809265137, 1, 0]",
                                         "rotation": "[0, 0, 0]",
-                                        "scaling": "[0.09999992698431015, 1, 1]"
+                                        "scaling": "[0.06999993324279785, 3, 1]"
                                       },
                                       "Component": {
                                         "active": true
@@ -363,7 +363,7 @@
                                       "local": {
                                         "translation": "[-0.10000000149011612, 1, -0.49999991059303284]",
                                         "rotation": "[0, 0, 0]",
-                                        "scaling": "[1.3000001907348633, 1, 0.10000000149011612]"
+                                        "scaling": "[1.3000001907348633, 3, 0.07000000774860382]"
                                       },
                                       "Component": {
                                         "active": true
@@ -418,7 +418,7 @@
                                       "local": {
                                         "translation": "[-0.10000000149011612, 1, 0.5]",
                                         "rotation": "[0, 0, 0]",
-                                        "scaling": "[1.3000000715255737, 1, 0.09999998658895493]"
+                                        "scaling": "[1.3000000715255737, 3, 0.06999999284744263]"
                                       },
                                       "Component": {
                                         "active": true
@@ -1212,7 +1212,7 @@
                             "scaling": "[1, 1, 1]"
                           },
                           "Component": {
-                            "active": true
+                            "active": false
                           }
                         }
                       }
@@ -1229,7 +1229,7 @@
                             "scaling": "[1, 1]"
                           },
                           "Component": {
-                            "active": true
+                            "active": false
                           },
                           "idMaterial": "Material|2021-05-30T21:25:47.296Z|40065"
                         }
@@ -1244,7 +1244,7 @@
                             "scaling": "[1, 1, 1]"
                           },
                           "Component": {
-                            "active": true
+                            "active": false
                           }
                         }
                       }

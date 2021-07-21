@@ -15,6 +15,7 @@ namespace Labyrinth {
     public static start(): void {
       let uiDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("user-interface");
       let uiHeadline: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("ui-headline");
+      let uiInput: HTMLInputElement = <HTMLInputElement>document.querySelector("input");
       uiHeadline.innerText = "Level: ";
 
       Gui.controller = new ƒui.Controller(gameState, uiDiv);

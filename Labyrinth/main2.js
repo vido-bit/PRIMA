@@ -8,30 +8,21 @@ var Labyrinth;
     let level3;
     let moveables;
     let ball;
-    let cmpRigidbodyBall;
-    let floor1;
-    let camPosition = new ƒ.Vector3(1, 10, 2);
-    let cmpRigidbodyEnv = new ƒ.ComponentRigidbody(0, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_2);
     let cmpCamera = new ƒ.ComponentCamera();
     let viewport = new ƒ.Viewport();
-    let ballBearing;
-    let cmpRigidBearing;
     let sphericalJoint;
     let environmentTransform;
     let barrier01;
     let barrier02;
     let barrier03;
     let barrier04;
-    let cmpRigidbodyLevel1;
-    let cmpRigidbodyLevel2;
-    let cmpRigidbodyLevel3;
     let activeLevel1;
-    let activeRgdbodyLevel1;
     let activeLevel2;
-    let activeRgdbodyLevel2;
     let activeLevel3;
-    let activeRgdbodyLevel3;
-    let cmpRgdBodies;
+    let collisionSound = new ƒ.Audio("jump.mp3");
+    let lvl1CompleteSound = new ƒ.Audio("person_cheering.mp3");
+    let lvl2CompleteSound = new ƒ.Audio("crowd_cheering.mp3");
+    let lvl3CompleteSound = new ƒ.Audio("sports-crowd_cheering.mp3");
     window.addEventListener("load", init);
     function init(_event) {
         let dialog = document.querySelector("dialog");
@@ -58,9 +49,6 @@ var Labyrinth;
         let canvas = document.querySelector("canvas");
         viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
         ƒ.Debug.log("Viewport:", viewport);
-        moveables = root.getChildrenByName("moveables")[0];
-        ball = moveables.getChildrenByName("ball")[0];
-        ballBearing = root.getChildrenByName("ballbearing")[0];
         createGeneralRigidBodies();
         // settingUpJoint();
         ƒ.Physics.adjustTransforms(root, true);
@@ -91,6 +79,11 @@ var Labyrinth;
         Labyrinth.Gui.start();
         ƒ.Loop.start();
     }
+    function createBall() {
+        ball = new Labyrinth.Ball();
+        ball.mtxLocal.translateY(10);
+        moveables.appendChild(ball);
+    }
     function update(_event) {
         ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
         ƒ.Physics.settings.debugDraw = true;
@@ -109,8 +102,6 @@ var Labyrinth;
         if (environment.mtxLocal.rotation.x > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S])) {
                 environment.mtxLocal.rotateX((-45 / ƒ.Loop.timeFrameGame) / 10);
-                //cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((-45 / ƒ.Loop.timeFrameGame) / 10));
-                // cmpRigidbodyBall.applyForce(ƒ.Vector3.Y(50));
             }
         }
         if (environment.mtxLocal.rotation.x < 15) {
@@ -120,12 +111,12 @@ var Labyrinth;
                 console.log(barrier01.mtxLocal.getY().y.toString());
             }
         }
-        //   ƒ.Physics.adjustTransforms(root, true);
+        checkBallPosition();
         viewport.draw();
         ƒ.Physics.adjustTransforms(root, true);
     }
     function setUpCam() {
-        cmpCamera.mtxPivot.translate(new ƒ.Vector3(7, 60, 15));
+        cmpCamera.mtxPivot.translate(new ƒ.Vector3(-5, 60, 15));
         cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
     }
     function createGeneralRigidBodies() {
@@ -140,19 +131,53 @@ var Labyrinth;
         level2 = basicFloor.getChildrenByName("level2")[0];
         level3 = basicFloor.getChildrenByName("level3")[0];
         moveables = root.getChildrenByName("moveables")[0];
-        ball = moveables.getChildrenByName("ball")[0];
+        ball = new Labyrinth.Ball();
+        moveables.appendChild(ball);
         let cmpRigidbodyBasicFloor = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
         basicFloor.addComponent(cmpRigidbodyBasicFloor);
         console.log(basicFloor);
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            cmpRigidbodyBarrier.restitution = 1;
             node.addComponent(cmpRigidbodyBarrier);
         }
-        let cmpRigidbodyBall = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE, ƒ.PHYSICS_GROUP.GROUP_2);
-        cmpRigidbodyBall.restitution = 0.1;
-        cmpRigidbodyBall.friction = 10;
-        cmpRigidbodyBall.mass = 10;
-        ball.addComponent(cmpRigidbodyBall);
+        // let cmpRigidbodyBall: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
+        //     1,
+        //     ƒ.PHYSICS_TYPE.DYNAMIC,
+        //     ƒ.COLLIDER_TYPE.SPHERE,
+        //     ƒ.PHYSICS_GROUP.GROUP_2
+        // );
+        // cmpRigidbodyBall.restitution = 0.1;
+        // cmpRigidbodyBall.friction = 10;
+        // cmpRigidbodyBall.mass = 10;
+        // ball.addComponent(cmpRigidbodyBall);
+    }
+    function handleCollisionEventEnter(_event) {
+        let level1Mtr = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(240, 20, 20)));
+        let hit1Mtr = new ƒ.Material("Hit1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 245, 60)));
+        let hit2Mtr = new ƒ.Material("Hit2", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 145, 60)));
+        let hit3Mtr = new ƒ.Material("Hit3", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 60, 60)));
+        if (_event.cmpRigidbody.getContainer().name == "ball") {
+            if (this.restitution == 2) {
+                this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
+                this.restitution += 2;
+            }
+            // if (this.restitution == 5) {
+            //     this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
+            //     ƒ.Debug.log("3. Hit");
+            //     this.restitution += 2;
+            // }
+            if (this.restitution == 1) {
+                this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit1Mtr;
+                ƒ.Debug.log("1. Hit");
+                this.restitution++;
+            }
+        }
+    }
+    function handleCollisionEventExit(_event) {
+        if (_event.cmpRigidbody.getContainer().name == "Ball") {
+            ƒ.Debug.log("Ball left me - Collider");
+        }
     }
     function checkActiveLevelNodes() {
         for (let node of level1.getChildren()) {
@@ -175,6 +200,8 @@ var Labyrinth;
         }
     }
     function handleLevelSetup() {
+        if (Labyrinth.gameState.level == 0)
+            Labyrinth.gameState.level = 1;
         if (Labyrinth.gameState.level == 1) {
             createLevel1();
             if (activeLevel2)
@@ -198,23 +225,12 @@ var Labyrinth;
         }
     }
     function createLevel1() {
-        // let level1Mtr: ƒ.Material = new ƒ.Material("Level1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(40, 240, 240, 0.6)));
-        // let innerBarrier01: ƒ.Node = createCompleteNode("innerBarrier", level1Mtr, new ƒ.MeshCube());
-        // level1.appendChild(innerBarrier01);
-        // innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.scale(new ƒ.Vector3(0.07, 3, 0.4));
-        // // innerBarrier01.getComponent(ƒ.ComponentTransform).mtxLocal.translate(new ƒ.Vector3(-0.5, 0.5, 0.25));
-        // let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
-        //     ƒ.PHYSICS_TYPE.KINEMATIC,
-        //     ƒ.COLLIDER_TYPE.CUBE,
-        //     ƒ.PHYSICS_GROUP.GROUP_1
-        // );
-        // innerBarrier01.addComponent(cmpRigidBarrier);
-        // console.log(innerBarrier01);
-        // ƒ.Physics.adjustTransforms(root, true);
         for (let node of level1.getChildren()) {
             node.activate(true);
             let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-            cmpRigidBarrier.restitution = 10;
+            cmpRigidBarrier.restitution = 1;
+            cmpRigidBarrier.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener("ColliderLeftCollision" /* COLLISION_EXIT */, handleCollisionEventExit);
             if (!node.getComponent(ƒ.ComponentRigidbody))
                 node.addComponent(cmpRigidBarrier);
         }
@@ -286,19 +302,47 @@ var Labyrinth;
             sphericalJoint.connectedRigidbody.applyTorque(new ƒ.Vector3(0, 1 * 100, 0));
         }
     }
-    function createCompleteNode(_name, _material, _mesh) {
-        let node = new ƒ.Node(_name);
-        let cmpMesh = new ƒ.ComponentMesh(_mesh);
-        let cmpMaterial = new ƒ.ComponentMaterial(_material);
-        let cmpTransform = new ƒ.ComponentTransform();
-        // let cmpRigidbody: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(_mass, _physicsType, _colType, _group);
-        // cmpRigidbody.restitution = 0.2;
-        // cmpRigidbody.friction = 0.8;
-        node.addComponent(cmpMesh);
-        node.addComponent(cmpMaterial);
-        node.addComponent(cmpTransform);
-        // node.addComponent(cmpRigidbody);
-        return node;
+    function checkBallPosition() {
+        if (ball.mtxLocal.translation.y < -10)
+            showSuccessMessage();
+    }
+    function showSuccessMessage() {
+        let successDiv = document.getElementById("success-message");
+        successDiv.style.display = "block";
+        // successDiv.setAttribute("display", "block");
+        let successHeading = document.getElementById("sm-heading");
+        let subHeading = document.getElementById("sm-subheading");
+        let lvl1Button = document.getElementById("lvl1-button");
+        let lvl2Button = document.getElementById("lvl2-button");
+        let lvl3Button = document.getElementById("lvl3-button");
+        successHeading.innerText = "Congratulations!";
+        subHeading.innerText = "Play again?";
+        lvl1Button.innerText = "Level 1";
+        lvl2Button.innerText = "Level 2";
+        lvl3Button.innerText = "Level 3";
+        lvl1Button.addEventListener("click", handleLevel1Click);
+        lvl2Button.addEventListener("click", handleLevel2Click);
+        lvl3Button.addEventListener("click", handleLevel3Click);
+        moveables.removeAllChildren();
+        viewport.draw();
+    }
+    function handleLevel1Click(_click) {
+        let successDiv = document.getElementById("success-message");
+        successDiv.style.display = "none";
+        Labyrinth.gameState.level = 1;
+        createBall();
+    }
+    function handleLevel2Click(_click) {
+        let successDiv = document.getElementById("success-message");
+        successDiv.style.display = "none";
+        Labyrinth.gameState.level = 2;
+        createBall();
+    }
+    function handleLevel3Click(_click) {
+        let successDiv = document.getElementById("success-message");
+        successDiv.style.display = "none";
+        Labyrinth.gameState.level = 3;
+        createBall();
     }
 })(Labyrinth || (Labyrinth = {}));
 //# sourceMappingURL=main2.js.map
