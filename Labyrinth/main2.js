@@ -97,11 +97,25 @@ var Labyrinth;
         //  checkActiveLevelNodes();
         //    handleLevelSetup();
         if (Labyrinth.gameState.level == 1) {
-            removeLevel1();
-            // createLevel1();
+            createLevel1();
+            if (activeLevel2)
+                removeLevel2();
+            if (activeLevel3)
+                removeLevel3();
         }
         if (Labyrinth.gameState.level == 2) {
-            createLevel1();
+            createLevel2();
+            if (activeLevel1)
+                removeLevel1();
+            if (activeLevel3)
+                removeLevel3();
+        }
+        if (Labyrinth.gameState.level == 3) {
+            createLevel3();
+            if (activeLevel1)
+                removeLevel1();
+            if (activeLevel2)
+                removeLevel2();
         }
         if (environment.mtxLocal.rotation.z > -15) {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
@@ -127,6 +141,7 @@ var Labyrinth;
                 console.log(barrier01.mtxLocal.getY().y.toString());
             }
         }
+        ƒ.Physics.adjustTransforms(root, true);
         viewport.draw();
     }
     function setUpCam() {
@@ -157,18 +172,6 @@ var Labyrinth;
         cmpRigidbodyBall.friction = 10;
         cmpRigidbodyBall.mass = 10;
         ball.addComponent(cmpRigidbodyBall);
-        for (let node of level1.getChildren()) {
-            cmpRigidbodyLevel1 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-            node.addComponent(cmpRigidbodyLevel1);
-        }
-        for (let node of level2.getChildren()) {
-            cmpRigidbodyLevel2 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-            node.addComponent(cmpRigidbodyLevel2);
-        }
-        for (let node of level3.getChildren()) {
-            cmpRigidbodyLevel3 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-            node.addComponent(cmpRigidbodyLevel3);
-        }
     }
     function checkActiveLevelNodes() {
         for (let node of level1.getChildren()) {
@@ -247,7 +250,6 @@ var Labyrinth;
             let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
             if (!node.getComponent(ƒ.ComponentRigidbody))
                 node.addComponent(cmpRigidBarrier);
-            ƒ.Physics.adjustTransforms(root, true);
         }
     }
     function createLevel2() {
