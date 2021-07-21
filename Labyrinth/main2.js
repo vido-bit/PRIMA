@@ -120,8 +120,9 @@ var Labyrinth;
                 console.log(barrier01.mtxLocal.getY().y.toString());
             }
         }
-        ƒ.Physics.adjustTransforms(root, true);
+        //   ƒ.Physics.adjustTransforms(root, true);
         viewport.draw();
+        ƒ.Physics.adjustTransforms(root, true);
     }
     function setUpCam() {
         cmpCamera.mtxPivot.translate(new ƒ.Vector3(7, 60, 15));
@@ -140,8 +141,9 @@ var Labyrinth;
         level3 = basicFloor.getChildrenByName("level3")[0];
         moveables = root.getChildrenByName("moveables")[0];
         ball = moveables.getChildrenByName("ball")[0];
-        let cmpRigidbodyFloor01 = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
-        basicFloor.addComponent(cmpRigidbodyFloor01);
+        let cmpRigidbodyBasicFloor = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+        basicFloor.addComponent(cmpRigidbodyBasicFloor);
+        console.log(basicFloor);
         for (let node of barriers.getChildren()) {
             let cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(2, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
             node.addComponent(cmpRigidbodyBarrier);
@@ -159,30 +161,18 @@ var Labyrinth;
             else
                 activeLevel1 = false;
         }
-        if (cmpRigidbodyLevel1.isActive)
-            activeRgdbodyLevel1 = true;
-        else
-            activeRgdbodyLevel2 = false;
         for (let node of level2.getChildren()) {
             if (node.isActive)
                 activeLevel2 = true;
             else
                 activeLevel2 = false;
         }
-        if (cmpRigidbodyLevel2.isActive)
-            activeRgdbodyLevel2 = true;
-        else
-            activeRgdbodyLevel2 = false;
         for (let node of level3.getChildren()) {
             if (node.isActive)
                 activeLevel3 = true;
             else
                 activeLevel3 = false;
         }
-        if (cmpRigidbodyLevel3.isActive)
-            activeRgdbodyLevel3 = true;
-        else
-            activeRgdbodyLevel3 = false;
     }
     function handleLevelSetup() {
         if (Labyrinth.gameState.level == 1) {
@@ -224,22 +214,26 @@ var Labyrinth;
         for (let node of level1.getChildren()) {
             node.activate(true);
             let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            cmpRigidBarrier.restitution = 10;
             if (!node.getComponent(ƒ.ComponentRigidbody))
                 node.addComponent(cmpRigidBarrier);
         }
     }
     function createLevel2() {
         for (let node of level2.getChildren()) {
-            node.addComponent(node.getComponent(ƒ.ComponentRigidbody));
             node.activate(true);
+            let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            if (!node.getComponent(ƒ.ComponentRigidbody))
+                node.addComponent(cmpRigidBarrier);
         }
     }
     function createLevel3() {
         for (let node of level3.getChildren()) {
-            node.addComponent(node.getComponent(ƒ.ComponentRigidbody));
             node.activate(true);
+            let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            if (!node.getComponent(ƒ.ComponentRigidbody))
+                node.addComponent(cmpRigidBarrier);
         }
-        level1.removeAllChildren();
     }
     function removeLevel1() {
         for (let node of level1.getChildren()) {
@@ -250,15 +244,17 @@ var Labyrinth;
     }
     function removeLevel2() {
         for (let node of level2.getChildren()) {
-            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            if (node.getComponent(ƒ.ComponentRigidbody) != null)
+                node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            node.activate(false);
         }
-        level2.removeAllChildren();
     }
     function removeLevel3() {
         for (let node of level3.getChildren()) {
-            node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            if (node.getComponent(ƒ.ComponentRigidbody) != null)
+                node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            node.activate(false);
         }
-        level3.removeAllChildren();
     }
     let stepWidth = 0.1;
     function hndKey(_event) {
