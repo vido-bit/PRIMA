@@ -21,3 +21,6 @@ div {
   left: 20px;
   color: #fff;
 }
+#user-interface {
+  display: inline-flex;
+}

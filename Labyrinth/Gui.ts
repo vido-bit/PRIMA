@@ -12,10 +12,12 @@ namespace Labyrinth {
 
   export class Gui {
     private static controller: ƒui.Controller;
-
     public static start(): void {
-      let domHud: HTMLDivElement = document.querySelector("div");
-      Gui.controller = new ƒui.Controller(gameState, domHud);
+      let uiDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("user-interface");
+      let uiHeadline: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("ui-headline");
+      uiHeadline.innerText = "Level: ";
+
+      Gui.controller = new ƒui.Controller(gameState, uiDiv);
       Gui.controller.updateUserInterface();
     }
   }

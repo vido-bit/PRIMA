@@ -2,19 +2,19 @@ var Labyrinth;
 (function (Labyrinth) {
     var ƒui = FudgeUserInterface;
     class GameState extends ƒ.Mutable {
-        constructor() {
-            super(...arguments);
-            this.level = 0;
-        }
+        level = 0;
         reduceMutator(_mutator) {
             /* */
         }
     }
     Labyrinth.gameState = new GameState();
     class Gui {
+        static controller;
         static start() {
-            let domHud = document.querySelector("div");
-            Gui.controller = new ƒui.Controller(Labyrinth.gameState, domHud);
+            let uiDiv = document.getElementById("user-interface");
+            let uiHeadline = document.getElementById("ui-headline");
+            uiHeadline.innerText = "Level: ";
+            Gui.controller = new ƒui.Controller(Labyrinth.gameState, uiDiv);
             Gui.controller.updateUserInterface();
         }
     }
