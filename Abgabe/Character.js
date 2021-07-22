@@ -2,18 +2,20 @@ var Leveldesign;
 (function (Leveldesign) {
     var ƒ = FudgeCore;
     class Character extends ƒ.Node {
+        jumpForce = 50;
+        cmpCamera;
+        cmpRigid;
+        camNode = new ƒ.Node("Cam");
+        direction = ƒ.Vector3.ZERO();
+        defaultSpeed = 5;
+        movementSpeed = 5;
+        isGrounded = false;
+        weight = 75;
+        activeProp = null;
+        hasProp = false;
+        propRigid = null;
         constructor(_cmpCamera) {
             super("Character");
-            this.jumpForce = 50;
-            this.camNode = new ƒ.Node("Cam");
-            this.direction = ƒ.Vector3.ZERO();
-            this.defaultSpeed = 5;
-            this.movementSpeed = 5;
-            this.isGrounded = false;
-            this.weight = 75;
-            this.activeProp = null;
-            this.hasProp = false;
-            this.propRigid = null;
             //Transform
             let cmpTransform = new ƒ.ComponentTransform();
             cmpTransform.mtxLocal.scale(new ƒ.Vector3(1, 1, 1));

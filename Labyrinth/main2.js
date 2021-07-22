@@ -2,7 +2,8 @@ var Labyrinth;
 (function (Labyrinth) {
     var ƒ = FudgeCore;
     let root;
-    let environment; // = new NeigePlattorm;
+    let environment; // NeigePlattorm;
+    let basicFloor;
     let level1;
     let level2;
     let level3;
@@ -10,8 +11,6 @@ var Labyrinth;
     let ball;
     let cmpCamera = new ƒ.ComponentCamera();
     let viewport = new ƒ.Viewport();
-    let sphericalJoint;
-    let environmentTransform;
     let barrier01;
     let barrier02;
     let barrier03;
@@ -19,10 +18,10 @@ var Labyrinth;
     let activeLevel1;
     let activeLevel2;
     let activeLevel3;
-    let collisionSound = new ƒ.Audio("jump.mp3");
-    let lvl1CompleteSound = new ƒ.Audio("person_cheering.mp3");
-    let lvl2CompleteSound = new ƒ.Audio("crowd_cheering.mp3");
-    let lvl3CompleteSound = new ƒ.Audio("sports-crowd_cheering.mp3");
+    let cmpLvl1Audio;
+    let cmpLvl12udio;
+    let cmpLvl13udio;
+    let cmpCollisionAudio;
     window.addEventListener("load", init);
     function init(_event) {
         let dialog = document.querySelector("dialog");
@@ -50,7 +49,7 @@ var Labyrinth;
         viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
         ƒ.Debug.log("Viewport:", viewport);
         createGeneralRigidBodies();
-        // settingUpJoint();
+        setUpAudio();
         ƒ.Physics.adjustTransforms(root, true);
         // hide the cursor when interacting, also suppressing right-click menu
         // canvas.addEventListener("mousedown", canvas.requestPointerLock);
@@ -121,7 +120,7 @@ var Labyrinth;
     }
     function createGeneralRigidBodies() {
         environment = root.getChildrenByName("environment")[0];
-        let basicFloor = environment.getChildrenByName("basicFloor")[0];
+        basicFloor = environment.getChildrenByName("basicFloor")[0];
         let barriers = basicFloor.getChildrenByName("barriers")[0];
         barrier01 = barriers.getChildrenByName("barrier01")[0];
         barrier02 = barriers.getChildrenByName("barrier02")[0];
@@ -158,6 +157,7 @@ var Labyrinth;
         let hit2Mtr = new ƒ.Material("Hit2", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 145, 60)));
         let hit3Mtr = new ƒ.Material("Hit3", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 60, 60)));
         if (_event.cmpRigidbody.getContainer().name == "ball") {
+            cmpCollisionAudio.play(true);
             if (this.restitution == 2) {
                 this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
                 this.restitution += 2;
@@ -272,36 +272,6 @@ var Labyrinth;
             node.activate(false);
         }
     }
-    let stepWidth = 0.1;
-    function hndKey(_event) {
-        let horizontal = 0;
-        let vertical = 0;
-        let height = 0;
-        if (_event.code == ƒ.KEYBOARD_CODE.A) {
-            horizontal -= 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.D) {
-            horizontal += 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.W) {
-            vertical -= 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.S) {
-            vertical += 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.Q) {
-            height += 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.E) {
-            height -= 1 * stepWidth;
-        }
-        let pos = environmentTransform.mtxLocal.translation;
-        pos.add(new ƒ.Vector3(horizontal, height, vertical));
-        environmentTransform.mtxLocal.translation = pos;
-        if (_event.code == ƒ.KEYBOARD_CODE.G) {
-            sphericalJoint.connectedRigidbody.applyTorque(new ƒ.Vector3(0, 1 * 100, 0));
-        }
-    }
     function checkBallPosition() {
         if (ball.mtxLocal.translation.y < -10)
             showSuccessMessage();
@@ -343,6 +313,33 @@ var Labyrinth;
         successDiv.style.display = "none";
         Labyrinth.gameState.level = 3;
         createBall();
+    }
+    function setUpAudio() {
+        let collisionSound = new ƒ.Audio("audio/jump.mp3");
+        let lvl1CompleteSound = new ƒ.Audio("audio/person_cheering.mp3");
+        let lvl2CompleteSound = new ƒ.Audio("audio/crowd_cheering.mp3");
+        let lvl3CompleteSound = new ƒ.Audio("audio/sports-crowd_cheering.mp3");
+        let cmpCollisionAudio = new ƒ.ComponentAudio(collisionSound, false, false);
+        let cmpLvl1Audio = new ƒ.ComponentAudio(lvl1CompleteSound, false, false);
+        let cmpLvl2Audio = new ƒ.ComponentAudio(lvl2CompleteSound, false, false);
+        let cmpLvl3Audio = new ƒ.ComponentAudio(lvl3CompleteSound, false, false);
+        let lvl1AudioNode = new ƒ.Node("Level1SuccessSound");
+        let lvl2AudioNode = new ƒ.Node("Level2SuccessSound");
+        let lvl3AudioNode = new ƒ.Node("Level3SuccessSound");
+        let collisionAudioNode = new ƒ.Node("CollisionSound");
+        let cmpListener = new ƒ.ComponentAudioListener();
+        //  cmpCamera.getContainer().addComponent(cmpListener);
+        lvl1AudioNode.addComponent(cmpLvl1Audio);
+        lvl2AudioNode.addComponent(cmpLvl2Audio);
+        lvl3AudioNode.addComponent(cmpLvl3Audio);
+        collisionAudioNode.addComponent(cmpCollisionAudio);
+        cmpCamera.getContainer().appendChild(lvl1AudioNode);
+        basicFloor.appendChild(lvl2AudioNode);
+        basicFloor.appendChild(lvl3AudioNode);
+        basicFloor.appendChild(collisionAudioNode);
+        ƒ.AudioManager.default.listenWith(cmpListener);
+        ƒ.AudioManager.default.listenTo(lvl1AudioNode);
+        ƒ.AudioManager.default.volume = 0.3;
     }
 })(Labyrinth || (Labyrinth = {}));
 //# sourceMappingURL=main2.js.map

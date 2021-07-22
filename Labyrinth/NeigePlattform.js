@@ -2,6 +2,9 @@ var Labyrinth;
 (function (Labyrinth) {
     var ƒ = FudgeCore;
     class NeigePlattorm extends ƒ.Node {
+        xAchse;
+        yAchse;
+        zAchse;
         constructor() {
             super("NeigePlattform");
             this.yAchse = this;

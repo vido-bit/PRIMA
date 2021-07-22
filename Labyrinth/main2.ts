@@ -1,7 +1,8 @@
 namespace Labyrinth {
     import ƒ = FudgeCore;
     let root: ƒ.Graph;
-    let environment: ƒ.Node; // = new NeigePlattorm;
+    let environment: ƒ.Node; // NeigePlattorm;
+    let basicFloor: ƒ.Node;
     let level1: ƒ.Node;
     let level2: ƒ.Node;
     let level3: ƒ.Node;
@@ -9,8 +10,6 @@ namespace Labyrinth {
     let ball: Ball;
     let cmpCamera: ƒ.ComponentCamera = new ƒ.ComponentCamera();
     let viewport: ƒ.Viewport = new ƒ.Viewport();
-    let sphericalJoint: ƒ.ComponentJointSpherical;
-    let environmentTransform: ƒ.ComponentTransform;
     let barrier01: ƒ.Node;
     let barrier02: ƒ.Node;
     let barrier03: ƒ.Node;
@@ -18,12 +17,12 @@ namespace Labyrinth {
     let activeLevel1: boolean;
     let activeLevel2: boolean;
     let activeLevel3: boolean;
-    let collisionSound: ƒ.Audio = new ƒ.Audio("jump.mp3");
-    let lvl1CompleteSound: ƒ.Audio = new ƒ.Audio("person_cheering.mp3");
-    let lvl2CompleteSound: ƒ.Audio = new ƒ.Audio("crowd_cheering.mp3");
-    let lvl3CompleteSound: ƒ.Audio = new ƒ.Audio("sports-crowd_cheering.mp3");
-    window.addEventListener("load", init);
+    let cmpLvl1Audio: ƒ.ComponentAudio;
+    let cmpLvl12udio: ƒ.ComponentAudio;
+    let cmpLvl13udio: ƒ.ComponentAudio;
+    let cmpCollisionAudio: ƒ.ComponentAudio;
 
+    window.addEventListener("load", init);
     function init(_event: Event): void {
 
         let dialog: HTMLDialogElement = document.querySelector("dialog");
@@ -53,7 +52,7 @@ namespace Labyrinth {
         viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
         ƒ.Debug.log("Viewport:", viewport);
         createGeneralRigidBodies();
-        // settingUpJoint();
+        setUpAudio();
         ƒ.Physics.adjustTransforms(root, true);
         // hide the cursor when interacting, also suppressing right-click menu
         // canvas.addEventListener("mousedown", canvas.requestPointerLock);
@@ -131,7 +130,7 @@ namespace Labyrinth {
 
     function createGeneralRigidBodies(): void {
         environment = root.getChildrenByName("environment")[0];
-        let basicFloor: ƒ.Node = environment.getChildrenByName("basicFloor")[0];
+        basicFloor = environment.getChildrenByName("basicFloor")[0];
         let barriers: ƒ.Node = basicFloor.getChildrenByName("barriers")[0];
         barrier01 = barriers.getChildrenByName("barrier01")[0];
         barrier02 = barriers.getChildrenByName("barrier02")[0];
@@ -180,6 +179,7 @@ namespace Labyrinth {
         let hit2Mtr: ƒ.Material = new ƒ.Material("Hit2", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 145, 60)));
         let hit3Mtr: ƒ.Material = new ƒ.Material("Hit3", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 60, 60)));
         if (_event.cmpRigidbody.getContainer().name == "ball") {
+            cmpCollisionAudio.play(true);
             if (this.restitution == 2) {
                 this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
                 this.restitution += 2;
@@ -307,37 +307,6 @@ namespace Labyrinth {
             node.activate(false);
         }
     }
-    let stepWidth: number = 0.1;
-    function hndKey(_event: KeyboardEvent): void {
-        let horizontal: number = 0;
-        let vertical: number = 0;
-        let height: number = 0;
-
-        if (_event.code == ƒ.KEYBOARD_CODE.A) {
-            horizontal -= 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.D) {
-            horizontal += 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.W) {
-            vertical -= 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.S) {
-            vertical += 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.Q) {
-            height += 1 * stepWidth;
-        }
-        if (_event.code == ƒ.KEYBOARD_CODE.E) {
-            height -= 1 * stepWidth;
-        }
-        let pos: ƒ.Vector3 = environmentTransform.mtxLocal.translation;
-        pos.add(new ƒ.Vector3(horizontal, height, vertical));
-        environmentTransform.mtxLocal.translation = pos;
-        if (_event.code == ƒ.KEYBOARD_CODE.G) {
-            sphericalJoint.connectedRigidbody.applyTorque(new ƒ.Vector3(0, 1 * 100, 0));
-        }
-    }
     function checkBallPosition(): void {
         if (ball.mtxLocal.translation.y < -10)
             showSuccessMessage();
@@ -379,5 +348,32 @@ namespace Labyrinth {
         successDiv.style.display = "none";
         gameState.level = 3;
         createBall();
+    }
+    function setUpAudio(): void {
+        let collisionSound: ƒ.Audio = new ƒ.Audio("audio/jump.mp3");
+        let lvl1CompleteSound: ƒ.Audio = new ƒ.Audio("audio/person_cheering.mp3");
+        let lvl2CompleteSound: ƒ.Audio = new ƒ.Audio("audio/crowd_cheering.mp3");
+        let lvl3CompleteSound: ƒ.Audio = new ƒ.Audio("audio/sports-crowd_cheering.mp3");
+        let cmpCollisionAudio: ƒ.ComponentAudio = new ƒ.ComponentAudio(collisionSound, false, false);
+        let cmpLvl1Audio: ƒ.ComponentAudio = new ƒ.ComponentAudio(lvl1CompleteSound, false, false);
+        let cmpLvl2Audio: ƒ.ComponentAudio = new ƒ.ComponentAudio(lvl2CompleteSound, false, false);
+        let cmpLvl3Audio: ƒ.ComponentAudio = new ƒ.ComponentAudio(lvl3CompleteSound, false, false);
+        let lvl1AudioNode: ƒ.Node = new ƒ.Node("Level1SuccessSound");
+        let lvl2AudioNode: ƒ.Node = new ƒ.Node("Level2SuccessSound");
+        let lvl3AudioNode: ƒ.Node = new ƒ.Node("Level3SuccessSound");
+        let collisionAudioNode: ƒ.Node = new ƒ.Node("CollisionSound");
+        let cmpListener: ƒ.ComponentAudioListener = new ƒ.ComponentAudioListener();
+        //  cmpCamera.getContainer().addComponent(cmpListener);
+        lvl1AudioNode.addComponent(cmpLvl1Audio);
+        lvl2AudioNode.addComponent(cmpLvl2Audio);
+        lvl3AudioNode.addComponent(cmpLvl3Audio);
+        collisionAudioNode.addComponent(cmpCollisionAudio);
+        cmpCamera.getContainer().appendChild(lvl1AudioNode);
+        basicFloor.appendChild(lvl2AudioNode);
+        basicFloor.appendChild(lvl3AudioNode);
+        basicFloor.appendChild(collisionAudioNode);
+        ƒ.AudioManager.default.listenWith(cmpListener);
+        ƒ.AudioManager.default.listenTo(lvl1AudioNode);
+        ƒ.AudioManager.default.volume = 0.3;
     }
 }
