@@ -12,12 +12,12 @@
 </script>
 <script type="text/javascript" src="../FudgeUserInterface/FudgeUserInterface.js">  </script>
 <!--Link stylesheet and internal resources-->
-<link rel="stylesheet" href="NewProject.css" />
+<link rel="stylesheet" href="labyrinth.css" />
 <link type="resources" src="data/LabyrinthScenes.json" />
 <!--My Code-->
 <script type="text/javascript" src="Gui.js"></script>
 <script type="text/javascript" src="Ball.js"></script>
-  <script type="text/javascript" src="main2.js"></script>
+  <script type="text/javascript" src="Main.js"></script>
 </head>
 <body>
 <!--Dialog shown at startup only-->
@@ -30,8 +30,13 @@
 </canvas>
 <div id="user-interface">
   <label id="ui-headline"></label>
-    <input type=number key="level" value="1" min="1" max="3"/>
+    <input id="level-choice" type=number key="level" value="1" min="1" max="3"/>
   </div>
+<div id="config-div" title="Please change the numbers in config.json to adapt the parameters.">
+  <label id="config">Ball Configuration:</label>
+  <p id="mass-configuration"></p>
+  <p id="restitution-configuration"></p>
+  <p id="friction-configuration"></p></div>
   <div id="success-message">
     <h2 id="sm-heading"></h2>
     <h3 id="sm-subheading"></h3>

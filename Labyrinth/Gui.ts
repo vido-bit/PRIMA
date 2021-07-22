@@ -1,6 +1,5 @@
 namespace Labyrinth {
   import ƒui = FudgeUserInterface;
-
   class GameState extends ƒ.Mutable {
     public level: number = 0;
     protected reduceMutator(_mutator: ƒ.Mutator): void {
@@ -15,9 +14,8 @@ namespace Labyrinth {
     public static start(): void {
       let uiDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("user-interface");
       let uiHeadline: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("ui-headline");
-      let uiInput: HTMLInputElement = <HTMLInputElement>document.querySelector("input");
+      let uiInput: HTMLInputElement = <HTMLInputElement>document.getElementById("level-choice");
       uiHeadline.innerText = "Level: ";
-
       Gui.controller = new ƒui.Controller(gameState, uiDiv);
       Gui.controller.updateUserInterface();
     }

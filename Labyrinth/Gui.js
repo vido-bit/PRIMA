@@ -15,7 +15,7 @@ var Labyrinth;
         static start() {
             let uiDiv = document.getElementById("user-interface");
             let uiHeadline = document.getElementById("ui-headline");
-            let uiInput = document.querySelector("input");
+            let uiInput = document.getElementById("level-choice");
             uiHeadline.innerText = "Level: ";
             Gui.controller = new ƒui.Controller(Labyrinth.gameState, uiDiv);
             Gui.controller.updateUserInterface();

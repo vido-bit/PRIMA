@@ -1,6 +1,5 @@
 namespace Labyrinth {
     import ƒ = FudgeCore;
-
     export class Ball extends ƒ.Node {
         public ballMtr: ƒ.Material = new ƒ.Material("ballMtr", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(255, 0, 0)));
         public sphereMesh: ƒ.MeshSphere = new ƒ.MeshSphere("kugel");
@@ -9,9 +8,10 @@ namespace Labyrinth {
             ƒ.PHYSICS_TYPE.DYNAMIC,
             ƒ.COLLIDER_TYPE.SPHERE,
             ƒ.PHYSICS_GROUP.GROUP_2
+
         );
 
-        constructor() {
+        constructor(_mass: number, _restitution: number, _friction: number) {
             super("ball");
             this.addComponent(new ƒ.ComponentMaterial(this.ballMtr));
             this.addComponent(new ƒ.ComponentMesh(this.sphereMesh));
@@ -20,8 +20,9 @@ namespace Labyrinth {
             ballTransform.mtxLocal.translate(new ƒ.Vector3(2, 5, 2));
             ballTransform.mtxLocal.scale(new ƒ.Vector3(1, 1, 1));
             this.addComponent(this.cmpRigidbodyBall);
-            this.cmpRigidbodyBall.restitution = 0.5;
-            this.cmpRigidbodyBall.friction = 10;
+            this.cmpRigidbodyBall.mass = _mass;
+            this.cmpRigidbodyBall.restitution = _restitution;
+            this.cmpRigidbodyBall.friction = _friction;
         }
     }
 }

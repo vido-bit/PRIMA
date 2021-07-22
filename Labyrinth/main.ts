@@ -1,297 +1,390 @@
 namespace Labyrinth {
-  import ƒ = FudgeCore;
-  let root: ƒ.Graph;
-  let environment: ƒ.Node; // = new NeigePlattorm;
-  let level1: ƒ.Node;
-  let moveables: ƒ.Node;
-  let ball: ƒ.Node;
-  let cmpRigidbodyBall: ƒ.ComponentRigidbody;
-  let floor1: ƒ.Node;
-  let floor01: ƒ.Node;
-  let floor02: ƒ.Node;
-  let camPosition: ƒ.Vector3 = new ƒ.Vector3(1, 10, 2);
-  let cmpRigidbodyEnv: ƒ.ComponentRigidbody;
-  let barriers: ƒ.Node;
-  let cmpRigidbodyBarrier: ƒ.ComponentRigidbody;
-  let cmpRigidbodyFloor01: ƒ.ComponentRigidbody;
-  let fixplate: ƒ.Node;
-
-  let ballBearing: ƒ.Node;
-  let cmpRigidBearing: ƒ.ComponentRigidbody;
-  let sphericalJoint: ƒ.ComponentJointSpherical;
-  let environmentTransform: ƒ.ComponentTransform;
-
-  let cmpCamera: ƒ.ComponentCamera = new ƒ.ComponentCamera();
-  let viewport: ƒ.Viewport = new ƒ.Viewport();
-
-  window.addEventListener("load", init);
-
-  function init(_event: Event): void {
-
-    let dialog: HTMLDialogElement = document.querySelector("dialog");
-    dialog.addEventListener("click", function (): void {
-      dialog.close();
-      startInteractiveViewport();
-    });
-    dialog.showModal();
-    ƒ.Physics.settings.debugDraw = true;
-    ƒ.Physics.initializePhysics();
-    ƒ.Physics.world.setSolverIterations(1000);
-    ƒ.Physics.settings.defaultRestitution = 0.3;
-    ƒ.Physics.settings.defaultFriction = 0.8;
-    ƒ.Debug.log("Project:", ƒ.Project.resources);
-  }
-
-  async function startInteractiveViewport(): Promise<void> {
-
-    // load resources referenced in the link-tag
-    await ƒ.Project.loadResourcesFromHTML();
-    ƒ.Debug.log("Project:", ƒ.Project.resources);
-    // pick the graph to show
-    root = <ƒ.Graph>ƒ.Project.resources["Graph|2021-05-30T21:24:22.133Z|16415"];
-    ƒ.Debug.log("Graph:", root);
-    // setup the viewport
-    let canvas: HTMLCanvasElement = document.querySelector("canvas");
-    viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
-    ƒ.Debug.log("Viewport:", viewport);
-    createRigidBodies();
-    settingUpJoints();
-    ƒ.Physics.adjustTransforms(root, true);
-    // hide the cursor when interacting, also suppressing right-click menu
-    canvas.addEventListener("mousedown", canvas.requestPointerLock);
-    canvas.addEventListener("mouseup", function (): void {
-      document.exitPointerLock();
-    });
-    // make the camera interactive (complex method in FudgeAid)
-    FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
-    // setup audio
-    setUpCam();
+    import ƒ = FudgeCore;
+    let config: Config;
+    let root: ƒ.Graph;
+    let environment: ƒ.Node; // NeigePlattorm;
+    let basicFloor: ƒ.Node;
+    let level1: ƒ.Node;
+    let level2: ƒ.Node;
+    let level3: ƒ.Node;
+    let moveables: ƒ.Node;
+    let ball: Ball;
+    let camNode: ƒ.Node = new ƒ.Node("camera");
+    let cmpCamera: ƒ.ComponentCamera;
+    let viewport: ƒ.Viewport = new ƒ.Viewport();
+    let barrier01: ƒ.Node;
+    let barrier02: ƒ.Node;
+    let barrier03: ƒ.Node;
+    let barrier04: ƒ.Node;
+    let activeLevel1: boolean;
+    let activeLevel2: boolean;
+    let activeLevel3: boolean;
+    let cmpLvlAudio: ƒ.ComponentAudio;
+    let cmpCollisionAudio: ƒ.ComponentAudio;
     let cmpListener: ƒ.ComponentAudioListener = new ƒ.ComponentAudioListener();
-    //  cmpCamera.getContainer().addComponent(cmpListener);
-    ƒ.AudioManager.default.listenWith(cmpListener);
-    ƒ.AudioManager.default.listenTo(root);
-    ƒ.Debug.log("Audio:", ƒ.AudioManager.default);
-    // draw viewport once for immediate feedback
-    viewport.draw();
-    canvas.dispatchEvent(
-      new CustomEvent("interactiveViewportStarted", {
-        bubbles: true,
-        detail: viewport
-      })
-    );
-    // environment.addComponent(new ƒ.ComponentTransform);
-    ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
-    Gui.start();
-    ƒ.Loop.start();
-  }
+    let barrierMtr: ƒ.Material = new ƒ.Material("LevelMtr", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.3137254901960784, 0.9607843137254902, 0.9411764705882353, 1)));
+    type Config = {
+        mass: number;
+        restitution: number;
+        friction: number;
+    };
+    window.addEventListener("load", init);
+    function init(_event: Event): void {
 
-  function update(_event: Event): void {
-
-    ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
-
-    ƒ.Physics.settings.debugDraw = true;
-
-    document.addEventListener("keydown", hndKey);
-
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
-      cmpRigidbodyFloor01.rotateBody(ƒ.Vector3.Z(-10));
-    // console.log(_event);
-
-    // let neigbarX: boolean = false;
-    // if (environment.mtxWorld.rotation.x < 15 && environment.mtxWorld.rotation.x > -15)
-    //   neigbarX = true;
-    // let neigbarZ: boolean = false;
-    // if (environment.mtxWorld.rotation.z < 15 && environment.mtxWorld.rotation.z > -15)
-    //   neigbarZ = true;
-
-    // if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]) && (neigbarX == true)) {
-    //   cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((-45 / ƒ.Loop.timeFrameGame) / 10));
-    //   console.log(environment.mtxWorld.rotation.toString());
-    //   //console.log(environment.mtxWorld.rotation.toString());
-    //   gameState.level--;
-    // }
-    // if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]) && (neigbarX == true)) {
-    //   cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((45 / ƒ.Loop.timeFrameGame) / 10));
-    // }
-    // if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]) && (neigbarZ == true)) {
-    //   //environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
-    //   cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((-45 / ƒ.Loop.timeFrameGame) / 10));
-    //   console.log(environment);
-    //   // cmpRigidbodyBall.applyForce(ƒ.Vector3.Y(50));
-
-    //   gameState.level++;
-    //   //console.log(cmpCamera.mtxPivot);
-    // }
-    // if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]) && (neigbarX == true)) {
-    //   //environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
-    //   cmpRigidbodyEnv.rotateBody(ƒ.Vector3.Z((45 / ƒ.Loop.timeFrameGame) / 10));
-    // }
-    viewport.draw();
-  }
-
-  function setUpCam(): void {
-
-    cmpCamera.mtxPivot.translate(new ƒ.Vector3(15, 40, -10));
-    cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
-
-  }
-
-  function createRigidBodies(): void {
-    environment = root.getChildrenByName("environment")[0];
-    ballBearing = root.getChildrenByName("ballBearing")[0];
-    fixplate = root.getChildrenByName("fixplate")[0];
-    floor01 = environment.getChildrenByName("floor01")[0];
-    barriers = floor01.getChildrenByName("barriers")[0];
-    level1 = floor01.getChildrenByName("level1")[0];
-    floor02 = level1.getChildrenByName("floor02")[0];
-    moveables = root.getChildrenByName("moveables")[0];
-    ball = moveables.getChildrenByName("ball")[0];
-
-    let cmpRigidbodyFixplate: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-      2,
-      ƒ.PHYSICS_TYPE.STATIC,
-      ƒ.COLLIDER_TYPE.CUBE,
-      ƒ.PHYSICS_GROUP.GROUP_1
-    );
-    fixplate.addComponent(cmpRigidbodyFixplate);
-
-    cmpRigidBearing = new ƒ.ComponentRigidbody(
-      3, ƒ.PHYSICS_TYPE.STATIC,
-      ƒ.COLLIDER_TYPE.CUBE,
-      ƒ.PHYSICS_GROUP.DEFAULT
-    );
-    ballBearing.addComponent(cmpRigidBearing);
-
-    cmpRigidbodyFloor01 = new ƒ.ComponentRigidbody(
-      2,
-      ƒ.PHYSICS_TYPE.DYNAMIC,
-      ƒ.COLLIDER_TYPE.CUBE,
-      ƒ.PHYSICS_GROUP.GROUP_1
-    );
-    floor01.addComponent(cmpRigidbodyFloor01);
-
-    let cmpRigidbodyFloor02: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-      2,
-      ƒ.PHYSICS_TYPE.KINEMATIC,
-      ƒ.COLLIDER_TYPE.CUBE,
-      ƒ.PHYSICS_GROUP.GROUP_1
-    );
-    floor02.addComponent(cmpRigidbodyFloor02);
-
-    for (let node of barriers.getChildren()) {
-      cmpRigidbodyBarrier = new ƒ.ComponentRigidbody(
-        2,
-        ƒ.PHYSICS_TYPE.KINEMATIC,
-        ƒ.COLLIDER_TYPE.CUBE,
-        ƒ.PHYSICS_GROUP.GROUP_1
-      );
-      node.addComponent(cmpRigidbodyBarrier);
+        let dialog: HTMLDialogElement = document.querySelector("dialog");
+        dialog.addEventListener("click", function (): void {
+            dialog.close();
+            startInteractiveViewport();
+        });
+        dialog.showModal();
+        //  ƒ.Physics.settings.debugDraw = true;
+        ƒ.Physics.initializePhysics();
+        ƒ.Physics.world.setSolverIterations(1000);
+        ƒ.Physics.settings.defaultRestitution = 0.1;
+        ƒ.Physics.settings.defaultFriction = 0.1;
     }
-
-
-
-    let cmpRigidbodyBall: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
-      1,
-      ƒ.PHYSICS_TYPE.DYNAMIC,
-      ƒ.COLLIDER_TYPE.SPHERE,
-      ƒ.PHYSICS_GROUP.GROUP_2
-    );
-    cmpRigidbodyBall.restitution = 0.8;
-    cmpRigidbodyBall.friction = 2.5;
-    ball.addComponent(cmpRigidbodyBall);
-
-    // cmpRigidbodyEnv = new ƒ.ComponentRigidbody(
-    //   4,
-    //   ƒ.PHYSICS_TYPE.DYNAMIC,
-    //   ƒ.COLLIDER_TYPE.CUBE,
-    //   ƒ.PHYSICS_GROUP.GROUP_1
-    // );
-    // environment.addComponent(cmpRigidbodyEnv);
-  }
-  //let barrierJoint: ƒ.ComponentJointRevolute;
-  function settingUpJoints(): void {
-    sphericalJoint = new ƒ.ComponentJointSpherical(cmpRigidBearing, cmpRigidbodyFloor01);
-    // environmentTransform.getContainer().addComponent(sphericalJoint);
-    floor01.addComponent(sphericalJoint);
-
-    sphericalJoint.springDamping = 1;
-    sphericalJoint.springFrequency = 1;
-
-    //  ƒ.Physics.adjustTransforms(environment, true);
-
-    // for (let barrierChilds of barriers.getChildren()) {
-    //   barrierJoint = new ƒ.ComponentJointRevolute(cmpRigidbodyEnv, barrierChilds.getComponent(ƒ.ComponentRigidbody));
-    //   barrierJoint.motorLimitLower = 1;
-    //   barrierJoint.motorLimitUpper = 0;
-    //   barrierChilds.addComponent(barrierJoint);
-
-    // let barrierFloorJoint: ƒ.ComponentJointRevolute = new ƒ.ComponentJointRevolute(floor1.getChild(0).getComponent(ƒ.ComponentRigidbody), barrierChilds.getComponent(ƒ.ComponentRigidbody));
-    // barrierFloorJoint.motorLimitLower = 1;
-    // barrierFloorJoint.motorLimitUpper = 0;
-    // barrierChilds.addComponent(barrierFloorJoint);
-
-    // }
-
-    // let floorJoint: ƒ.ComponentJointRevolute = new ƒ.ComponentJointRevolute(floor1.getChild(1).getComponent(ƒ.ComponentRigidbody), floor1.getChild(0).getComponent(ƒ.ComponentRigidbody));
-    // floorJoint.motorLimitLower = 2;
-    // floorJoint.motorLimitUpper = 1;
-    // floor1.getChild(0).addComponent(floorJoint);
-
-    // // for (let floor1childs of floor1.getChildren()) {
-    // let floor1Joint: ƒ.ComponentJointRevolute = new ƒ.ComponentJointRevolute(floor1.getComponent(ƒ.ComponentRigidbody), floor1.getChild(0).getComponent(ƒ.ComponentRigidbody));
-    // floor1Joint.motorLimitLower = 2;
-    // floor1Joint.motorLimitUpper = 1;
-    // floor1.getChild(0).addComponent(floor1Joint);
-    // // }
-
-    // let fixFloorJoint: ƒ.ComponentJointRevolute = new ƒ.ComponentJointRevolute(cmpRigidbodyEnv, floor1.getChild(1).getComponent(ƒ.ComponentRigidbody));
-    // fixFloorJoint.motorLimitLower = 2;
-    // floorJoint.motorLimitUpper = 1;
-    // floor1.getChild(1).addComponent(fixFloorJoint);
-
-    // let barrierFloor12Joint: ƒ.ComponentJointRevolute = new ƒ.ComponentJointRevolute(floor12.getComponent(ƒ.ComponentRigidbody), barriers.getChild(0).getComponent(ƒ.ComponentRigidbody));
-    // barrierFloor12Joint.motorLimitLower = 2;
-    // barrierFloor12Joint.motorLimitUpper = 1;
-    // barriers.getChild(0).addComponent(barrierFloor12Joint);
-
-  }
-
-  let stepWidth: number = 0.1;
-  function hndKey(_event: KeyboardEvent): void {
-    let horizontal: number = 0;
-    let vertical: number = 0;
-    let height: number = 0;
-
-    if (_event.code == ƒ.KEYBOARD_CODE.A) {
-      horizontal -= 1 * stepWidth;
+    async function startInteractiveViewport(): Promise<void> {
+        let response: Response = await fetch("data/Config.json");
+        let responseString: string = await response.text();
+        config = <Config>JSON.parse(responseString);
+        // load resources referenced in the link-tag
+        await ƒ.Project.loadResourcesFromHTML();
+        // pick the graph to show
+        root = <ƒ.Graph>ƒ.Project.resources["Graph|2021-05-30T21:24:22.133Z|16415"];
+        // setup the viewport
+        let canvas: HTMLCanvasElement = document.querySelector("canvas");
+        cmpCamera = new ƒ.ComponentCamera();
+        viewport.initialize("InteractiveViewport", root, cmpCamera, canvas);
+        createGeneralRigidBodies();
+        setUpAudio();
+        ƒ.Physics.adjustTransforms(root, true);
+        // make the camera interactive (complex method in FudgeAid)
+        FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
+        // setup audio
+        setUpCam();
+        // draw viewport once for immediate feedback
+        viewport.draw();
+        ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
+        Gui.start();
+        ƒ.Loop.start();
     }
-    if (_event.code == ƒ.KEYBOARD_CODE.D) {
-      horizontal += 1 * stepWidth;
+    function createBall(): void {
+        let configMass: HTMLParagraphElement = <HTMLParagraphElement>document.getElementById("mass-configuration");
+        let configRestitution: HTMLParagraphElement = <HTMLParagraphElement>document.getElementById("restitution-configuration");
+        let configFriction: HTMLParagraphElement = <HTMLParagraphElement>document.getElementById("friction-configuration");
+        ball = new Ball(config.mass, config.restitution, config.friction);
+        ball.mtxLocal.translateY(10);
+        moveables.appendChild(ball);
+        configMass.innerText = "Mass: " + config.mass.toString();
+        configRestitution.innerText = "Restitution: " + config.restitution.toString();
+        configFriction.innerText = "Friction: " + config.friction.toString();
     }
-    if (_event.code == ƒ.KEYBOARD_CODE.W) {
-      vertical -= 1 * stepWidth;
+    function update(_event: Event): void {
+        ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
+        //  ƒ.Physics.settings.debugDraw = true;
+        checkActiveLevelNodes();
+        handleLevelSetup();
+        if (environment.mtxLocal.rotation.z > -15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D])) {
+                environment.mtxLocal.rotateZ((-45 / ƒ.Loop.timeFrameGame) / 10);
+            }
+        }
+        if (environment.mtxLocal.rotation.z < 15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A])) {
+                environment.mtxLocal.rotateZ((45 / ƒ.Loop.timeFrameGame) / 10);
+            }
+        }
+        if (environment.mtxLocal.rotation.x > -15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W])) {
+                environment.mtxLocal.rotateX((-45 / ƒ.Loop.timeFrameGame) / 10);
+            }
+        }
+        if (environment.mtxLocal.rotation.x < 15) {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S])) {
+                environment.mtxLocal.rotateX((45 / ƒ.Loop.timeFrameGame) / 10);
+            }
+        }
+        checkBallPosition();
+        ƒ.AudioManager.default.update();
+        viewport.draw();
+        ƒ.Physics.adjustTransforms(root, true);
     }
-    if (_event.code == ƒ.KEYBOARD_CODE.S) {
-      vertical += 1 * stepWidth;
+    function setUpCam(): void {
+        camNode.addComponent(cmpCamera);
+        cmpCamera.mtxPivot.translate(new ƒ.Vector3(-5, 60, 15));
+        cmpCamera.mtxPivot.lookAt(ƒ.Vector3.ZERO());
     }
-    if (_event.code == ƒ.KEYBOARD_CODE.Q) {
-      height += 1 * stepWidth;
+    function createGeneralRigidBodies(): void {
+        environment = root.getChildrenByName("environment")[0];
+        basicFloor = environment.getChildrenByName("basicFloor")[0];
+        let barriers: ƒ.Node = basicFloor.getChildrenByName("barriers")[0];
+        barrier01 = barriers.getChildrenByName("barrier01")[0];
+        barrier02 = barriers.getChildrenByName("barrier02")[0];
+        barrier03 = barriers.getChildrenByName("barrier03")[0];
+        barrier04 = barriers.getChildrenByName("barrier04")[0];
+        level1 = basicFloor.getChildrenByName("level1")[0];
+        level2 = basicFloor.getChildrenByName("level2")[0];
+        level3 = basicFloor.getChildrenByName("level3")[0];
+        moveables = root.getChildrenByName("moveables")[0];
+        createBall();
+        moveables.appendChild(ball);
+        let cmpRigidbodyBasicFloor: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
+            2,
+            ƒ.PHYSICS_TYPE.KINEMATIC,
+            ƒ.COLLIDER_TYPE.CUBE,
+            ƒ.PHYSICS_GROUP.GROUP_1
+        );
+        basicFloor.addComponent(cmpRigidbodyBasicFloor);
+        for (let node of barriers.getChildren()) {
+            let cmpRigidbodyBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(
+                2,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            cmpRigidbodyBarrier.restitution = 1;
+            node.addComponent(cmpRigidbodyBarrier);
+        }
     }
-    if (_event.code == ƒ.KEYBOARD_CODE.E) {
-      height -= 1 * stepWidth;
+    function handleCollisionEventEnter(_event: ƒ.EventPhysics): void {
+        let hit1Mtr: ƒ.Material = new ƒ.Material("Hit1", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(255, 200, 0)));
+        let hit2Mtr: ƒ.Material = new ƒ.Material("Hit2", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(255, 0, 0)));
+        if (_event.cmpRigidbody.getContainer().name == "ball") {
+            cmpCollisionAudio.play(true);
+            if (this.restitution == 2) {
+                this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit2Mtr;
+                this.restitution += 2;
+            }
+            if (this.restitution == 1) {
+                this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit1Mtr;
+                this.restitution = 2;
+            }
+        }
     }
-    //let pos: ƒ.Vector3 = environmentTransform.mtxLocal.translation;
-    //pos.add(new ƒ.Vector3(horizontal, height, vertical));
-    //  environmentTransform.mtxLocal.translation = pos;
-    if (_event.code == ƒ.KEYBOARD_CODE.G) {
-      console.log(sphericalJoint.connectedRigidbody);
-      sphericalJoint.connectedRigidbody.applyAngularImpulse(new ƒ.Vector3(0, 0, 1 * 100));
-
-      // .applyForce(new ƒ.Vector3(0, 0, 1 * 100));
-      console.log("G is pressed");
+    function handleCollisionEventExit(_event: ƒ.EventPhysics): void {
+        if (_event.cmpRigidbody.getContainer().name == "Ball") {
+            ƒ.Debug.log("Ball left me - Collider");
+        }
     }
-    if (_event.code == ƒ.KEYBOARD_CODE.A) {
-      cmpRigidbodyEnv.rotateBody(ƒ.Vector3.X((-45 / ƒ.Loop.timeFrameGame) / 10));
+    function checkActiveLevelNodes(): void {
+        for (let node of level1.getChildren()) {
+            if (node.isActive)
+                activeLevel1 = true;
+            else
+                activeLevel1 = false;
+        }
+        for (let node of level2.getChildren()) {
+            if (node.isActive)
+                activeLevel2 = true;
+            else
+                activeLevel2 = false;
+        }
+        for (let node of level3.getChildren()) {
+            if (node.isActive)
+                activeLevel3 = true;
+            else
+                activeLevel3 = false;
+        }
     }
-  }
+    function handleLevelSetup(): void {
+        if (gameState.level == 0)
+            gameState.level = 1;
+        if (gameState.level == 1) {
+            createLevel1();
+            if (activeLevel2)
+                removeLevel2();
+            if (activeLevel3)
+                removeLevel3();
+        }
+        if (gameState.level == 2) {
+            createLevel2();
+            if (activeLevel1)
+                removeLevel1();
+            if (activeLevel3)
+                removeLevel3();
+        }
+        if (gameState.level == 3) {
+            createLevel3();
+            if (activeLevel1)
+                removeLevel1();
+            if (activeLevel2)
+                removeLevel2();
+        }
+    }
+    function createLevel1(): void {
+        for (let node of level1.getChildren()) {
+            node.activate(true);
+            let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            cmpRigidBarrier.restitution = 1;
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
+            if (!node.getComponent(ƒ.ComponentRigidbody))
+                node.addComponent(cmpRigidBarrier);
+        }
+    }
+    function createLevel2(): void {
+        for (let node of level2.getChildren()) {
+            node.activate(true);
+            let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            cmpRigidBarrier.restitution = 1;
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
+            if (!node.getComponent(ƒ.ComponentRigidbody))
+                node.addComponent(cmpRigidBarrier);
+        }
+    }
+    function createLevel3(): void {
+        for (let node of level3.getChildren()) {
+            node.activate(true);
+            let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            cmpRigidBarrier.restitution = 1;
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
+            if (!node.getComponent(ƒ.ComponentRigidbody))
+                node.addComponent(cmpRigidBarrier);
+        }
+    }
+    function removeLevel1(): void {
+        for (let node of level1.getChildren()) {
+            if (node.getComponent(ƒ.ComponentRigidbody) != null)
+                node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            node.activate(false);
+        }
+    }
+    function removeLevel2(): void {
+        for (let node of level2.getChildren()) {
+            if (node.getComponent(ƒ.ComponentRigidbody) != null)
+                node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            node.activate(false);
+        }
+    }
+    function removeLevel3(): void {
+        for (let node of level3.getChildren()) {
+            if (node.getComponent(ƒ.ComponentRigidbody) != null)
+                node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+            node.activate(false);
+        }
+    }
+    function checkBallPosition(): void {
+        let success: boolean = false;
+        if (ball.mtxLocal.translation.y < -10) {
+            cmpLvlAudio.play(true);
+            success = true;
+        }
+        if (success)
+            showSuccessMessage();
+    }
+    function showSuccessMessage(): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "block";
+        let successHeading: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("sm-heading");
+        let subHeading: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("sm-subheading");
+        let lvl1Button: HTMLAnchorElement = <HTMLAnchorElement>document.getElementById("lvl1-button");
+        let lvl2Button: HTMLAnchorElement = <HTMLAnchorElement>document.getElementById("lvl2-button");
+        let lvl3Button: HTMLAnchorElement = <HTMLAnchorElement>document.getElementById("lvl3-button");
+        successHeading.innerText = "Congratulations!";
+        subHeading.innerText = "Play again?";
+        lvl1Button.innerText = "Level 1";
+        lvl2Button.innerText = "Level 2";
+        lvl3Button.innerText = "Level 3";
+        lvl1Button.addEventListener("click", handleLevel1Click);
+        lvl2Button.addEventListener("click", handleLevel2Click);
+        lvl3Button.addEventListener("click", handleLevel3Click);
+        moveables.removeAllChildren();
+        viewport.draw();
+    }
+    function handleLevel1Click(_click: Event): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "none";
+        for (let node of level1.getChildren()) {
+            node.activate(true);
+            node.getComponent(ƒ.ComponentMaterial).material = barrierMtr;
+            let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            if (!node.getComponent(ƒ.ComponentRigidbody)) {
+                cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+                cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
+                cmpRigidBarrier.restitution = 1;
+                node.addComponent(cmpRigidBarrier);
+            }
+            else node.getComponent(ƒ.ComponentRigidbody).restitution = 1;
+        }
+        createBall();
+        gameState.level = 1;
+    }
+    function handleLevel2Click(_click: Event): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "none";
+        for (let node of level2.getChildren()) {
+            node.activate(true);
+            node.getComponent(ƒ.ComponentMaterial).material = barrierMtr;
+            let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            if (!node.getComponent(ƒ.ComponentRigidbody)) {
+                cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+                cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
+                cmpRigidBarrier.restitution = 1;
+                node.addComponent(cmpRigidBarrier);
+            }
+            else node.getComponent(ƒ.ComponentRigidbody).restitution = 1;
+        }
+        createBall();
+        gameState.level = 2;
+    }
+    function handleLevel3Click(_click: Event): void {
+        let successDiv: HTMLDivElement = <HTMLDivElement>document.getElementById("success-message");
+        successDiv.style.display = "none";
+        for (let node of level3.getChildren()) {
+            node.getComponent(ƒ.ComponentMaterial).material = barrierMtr;
+            node.activate(true);
+            let cmpRigidBarrier: ƒ.ComponentRigidbody = new ƒ.ComponentRigidbody(1,
+                ƒ.PHYSICS_TYPE.KINEMATIC,
+                ƒ.COLLIDER_TYPE.CUBE,
+                ƒ.PHYSICS_GROUP.GROUP_1
+            );
+            if (!node.getComponent(ƒ.ComponentRigidbody)) {
+                cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, handleCollisionEventEnter);
+                cmpRigidBarrier.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_EXIT, handleCollisionEventExit);
+                cmpRigidBarrier.restitution = 1;
+                node.addComponent(cmpRigidBarrier);
+            }
+            else node.getComponent(ƒ.ComponentRigidbody).restitution = 1;
+        }
+        createBall();
+        gameState.level = 3;
+    }
+    function setUpAudio(): void {
+        let collisionSound: ƒ.Audio = new ƒ.Audio("audio/jump.mp3");
+        let lvlCompleteSound: ƒ.Audio = new ƒ.Audio("audio/crowd_cheering.mp3");
+        cmpCollisionAudio = new ƒ.ComponentAudio(collisionSound, false, false);
+        cmpLvlAudio = new ƒ.ComponentAudio(lvlCompleteSound, false, false);
+        let lvlAudioNode: ƒ.Node = new ƒ.Node("LevelSuccessSound");
+        let collisionAudioNode: ƒ.Node = new ƒ.Node("CollisionSound");
+        camNode.addComponent(cmpListener);
+        lvlAudioNode.addComponent(cmpLvlAudio);
+        collisionAudioNode.addComponent(cmpCollisionAudio);
+        basicFloor.appendChild(lvlAudioNode);
+        basicFloor.appendChild(collisionAudioNode);
+        ƒ.AudioManager.default.listenWith(cmpListener);
+        ƒ.AudioManager.default.listenTo(root);
+        ƒ.AudioManager.default.volume = 0.2;
+    }
 }

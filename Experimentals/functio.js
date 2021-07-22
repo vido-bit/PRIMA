@@ -235,4 +235,4 @@ var Labyrinth;
         // ƒ.AudioManager.default.suspend();
     }
 })(Labyrinth || (Labyrinth = {}));
-//# sourceMappingURL=function.js.map
+//# sourceMappingURL=functio.js.map

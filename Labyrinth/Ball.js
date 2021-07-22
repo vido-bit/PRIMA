@@ -2,7 +2,7 @@ var Labyrinth;
 (function (Labyrinth) {
     var ƒ = FudgeCore;
     class Ball extends ƒ.Node {
-        constructor() {
+        constructor(_mass, _restitution, _friction) {
             super("ball");
             this.ballMtr = new ƒ.Material("ballMtr", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(255, 0, 0)));
             this.sphereMesh = new ƒ.MeshSphere("kugel");
@@ -14,8 +14,9 @@ var Labyrinth;
             ballTransform.mtxLocal.translate(new ƒ.Vector3(2, 5, 2));
             ballTransform.mtxLocal.scale(new ƒ.Vector3(1, 1, 1));
             this.addComponent(this.cmpRigidbodyBall);
-            this.cmpRigidbodyBall.restitution = 0.5;
-            this.cmpRigidbodyBall.friction = 10;
+            this.cmpRigidbodyBall.mass = _mass;
+            this.cmpRigidbodyBall.restitution = _restitution;
+            this.cmpRigidbodyBall.friction = _friction;
         }
     }
     Labyrinth.Ball = Ball;
