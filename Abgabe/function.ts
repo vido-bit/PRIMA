@@ -62,7 +62,6 @@ namespace Leveldesign {
         viewport = new ƒ.Viewport;
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         viewport.draw();
-        ƒ.Physics.adjustTransforms(root, true);
         ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
         ƒ.Loop.start();
         //  ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);

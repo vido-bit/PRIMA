@@ -19,8 +19,8 @@ var Labyrinth;
     let activeLevel2;
     let activeLevel3;
     let cmpLvl1Audio;
-    let cmpLvl12udio;
-    let cmpLvl13udio;
+    let cmpLvl2Audio;
+    let cmpLvl3Audio;
     let cmpCollisionAudio;
     window.addEventListener("load", init);
     function init(_event) {
@@ -158,6 +158,7 @@ var Labyrinth;
         let hit3Mtr = new ƒ.Material("Hit3", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(245, 60, 60)));
         if (_event.cmpRigidbody.getContainer().name == "ball") {
             cmpCollisionAudio.play(true);
+            console.log(cmpCollisionAudio);
             if (this.restitution == 2) {
                 this.getContainer().getComponent(ƒ.ComponentMaterial).material = hit3Mtr;
                 this.restitution += 2;
@@ -172,6 +173,7 @@ var Labyrinth;
                 ƒ.Debug.log("1. Hit");
                 this.restitution++;
             }
+            cmpLvl1Audio.play(true);
         }
     }
     function handleCollisionEventExit(_event) {
@@ -239,6 +241,8 @@ var Labyrinth;
         for (let node of level2.getChildren()) {
             node.activate(true);
             let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            cmpRigidBarrier.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener("ColliderLeftCollision" /* COLLISION_EXIT */, handleCollisionEventExit);
             if (!node.getComponent(ƒ.ComponentRigidbody))
                 node.addComponent(cmpRigidBarrier);
         }
@@ -247,6 +251,8 @@ var Labyrinth;
         for (let node of level3.getChildren()) {
             node.activate(true);
             let cmpRigidBarrier = new ƒ.ComponentRigidbody(1, ƒ.PHYSICS_TYPE.KINEMATIC, ƒ.COLLIDER_TYPE.CUBE, ƒ.PHYSICS_GROUP.GROUP_1);
+            cmpRigidBarrier.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, handleCollisionEventEnter);
+            cmpRigidBarrier.addEventListener("ColliderLeftCollision" /* COLLISION_EXIT */, handleCollisionEventExit);
             if (!node.getComponent(ƒ.ComponentRigidbody))
                 node.addComponent(cmpRigidBarrier);
         }
@@ -319,10 +325,10 @@ var Labyrinth;
         let lvl1CompleteSound = new ƒ.Audio("audio/person_cheering.mp3");
         let lvl2CompleteSound = new ƒ.Audio("audio/crowd_cheering.mp3");
         let lvl3CompleteSound = new ƒ.Audio("audio/sports-crowd_cheering.mp3");
-        let cmpCollisionAudio = new ƒ.ComponentAudio(collisionSound, false, false);
-        let cmpLvl1Audio = new ƒ.ComponentAudio(lvl1CompleteSound, false, false);
-        let cmpLvl2Audio = new ƒ.ComponentAudio(lvl2CompleteSound, false, false);
-        let cmpLvl3Audio = new ƒ.ComponentAudio(lvl3CompleteSound, false, false);
+        cmpCollisionAudio = new ƒ.ComponentAudio(collisionSound, false, false);
+        cmpLvl1Audio = new ƒ.ComponentAudio(lvl1CompleteSound, false, false);
+        cmpLvl2Audio = new ƒ.ComponentAudio(lvl2CompleteSound, false, false);
+        cmpLvl3Audio = new ƒ.ComponentAudio(lvl3CompleteSound, false, false);
         let lvl1AudioNode = new ƒ.Node("Level1SuccessSound");
         let lvl2AudioNode = new ƒ.Node("Level2SuccessSound");
         let lvl3AudioNode = new ƒ.Node("Level3SuccessSound");
@@ -333,13 +339,14 @@ var Labyrinth;
         lvl2AudioNode.addComponent(cmpLvl2Audio);
         lvl3AudioNode.addComponent(cmpLvl3Audio);
         collisionAudioNode.addComponent(cmpCollisionAudio);
-        cmpCamera.getContainer().appendChild(lvl1AudioNode);
-        basicFloor.appendChild(lvl2AudioNode);
-        basicFloor.appendChild(lvl3AudioNode);
-        basicFloor.appendChild(collisionAudioNode);
+        // cmpCamera.getContainer().appendChild(lvl1AudioNode);
+        // basicFloor.appendChild(lvl2AudioNode);
+        // basicFloor.appendChild(lvl3AudioNode);
+        // basicFloor.appendChild(collisionAudioNode);
         ƒ.AudioManager.default.listenWith(cmpListener);
-        ƒ.AudioManager.default.listenTo(lvl1AudioNode);
-        ƒ.AudioManager.default.volume = 0.3;
+        ƒ.AudioManager.default.listenTo(collisionAudioNode);
+        ƒ.AudioManager.default.volume = 1.3;
+        ƒ.AudioManager.default.suspend();
     }
 })(Labyrinth || (Labyrinth = {}));
 //# sourceMappingURL=main2.js.map
